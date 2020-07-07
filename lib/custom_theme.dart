@@ -55,6 +55,7 @@ class CustomCupertinoThemeData {
 // ignore: must_be_immutable
 class CustomTheme extends StatefulWidget {
   final Widget child;
+  final String prefix;
   final String defaultLightTheme;
   final String defaultDarkTheme;
   final String defaultCupertinoTheme;
@@ -64,6 +65,7 @@ class CustomTheme extends StatefulWidget {
   Map<String, CustomCupertinoThemeData> cupertinoThemes;
 
   /// [CustomTheme] needs to be on top of [MaterialApp] or [CupertinoApp],
+  /// Add [prefix] to separate data on storage.
   ///
   /// pass app [BuildContext] like this from your [MaterialApp] or [CupertinoApp]
   /// ```
@@ -74,11 +76,14 @@ class CustomTheme extends StatefulWidget {
   /// ```
   /// pass [themes] using a map [Map<String, ThemeData>] and use key of [map] as [themeKey]
   ///
-  /// hard code some default setting for [defaultLightTheme], [defaultDarkTheme], [themeMode]
+  /// hard code some default setting for [defaultLightTheme], [defaultDarkTheme] and [themeMode]
   ///
   /// set [keepOnDisableFollow] to [true] to keep current applied theme even if [themeMode] changes from [ThemeMode.system]
+  ///
+  /// [cupertinoThemes] does not support [themeMode]. it always follow system setting.
   CustomTheme({
     Key key,
+    this.prefix = '',
     this.defaultLightTheme,
     this.defaultDarkTheme,
     this.defaultCupertinoTheme,
@@ -103,6 +108,8 @@ class CustomThemeState extends State<CustomTheme> {
   SharedPreferences sharedPrefs;
 
   BuildContext _mediaContext;
+
+  String _currentThemeKey;
 
   String _currentCupertinoThemeKey;
 
@@ -129,6 +136,9 @@ class CustomThemeState extends State<CustomTheme> {
 
   /// get [themeKey] of currently applied cupertino theme.
   String get currentCupertinoThemeKey => _currentCupertinoThemeKey;
+
+  /// get [themeKey] of currently applied theme.
+  String get currentThemeKey => _currentThemeKey;
 
   void setMediaContext(BuildContext ctx) {
     _mediaContext = ctx;
@@ -165,15 +175,17 @@ class CustomThemeState extends State<CustomTheme> {
       };
     _light = _getTheme(widget.defaultLightTheme);
     _dark = _getTheme(widget.defaultDarkTheme);
-    _cupertinoTheme = _getCupertinoTheme(widget.defaultCupertinoTheme);
+    _cupertinoTheme = _getCupertinoThemeData(widget.defaultCupertinoTheme);
     _mode = widget.themeMode;
     SharedPreferences.getInstance().then((prefs) {
       sharedPrefs = prefs;
-      final isDark = sharedPrefs.getBool('dark-mode');
-      final followSystem = sharedPrefs.getBool('follow-system');
-      final dLight = sharedPrefs.getString('default-light');
-      final dDark = sharedPrefs.getString('default-dark');
-      final dCupertino = sharedPrefs.getString('default-cupertino');
+      final isDark = sharedPrefs.getBool('${widget.prefix}-dark-mode');
+      final followSystem =
+          sharedPrefs.getBool('${widget.prefix}-follow-system');
+      final dLight = sharedPrefs.getString('${widget.prefix}-default-light');
+      final dDark = sharedPrefs.getString('${widget.prefix}-default-dark');
+      final dCupertino =
+          sharedPrefs.getString('${widget.prefix}-default-cupertino');
       if (dCupertino != null &&
           widget.cupertinoThemes.containsKey(dCupertino)) {
         _cupertinoTheme = widget.cupertinoThemes[dCupertino];
@@ -191,7 +203,11 @@ class CustomThemeState extends State<CustomTheme> {
         });
       }
     });
-    print(_light.key);
+    Future.delayed(Duration(milliseconds: 0), () {
+      setState(() {
+        _currentThemeKey = getCurrentThemeData().key;
+      });
+    });
     super.initState();
   }
 
@@ -203,7 +219,7 @@ class CustomThemeState extends State<CustomTheme> {
 
   /// get [ThemeData] by [key] name of [themes]
   /// returns [null] if theme not found
-  CustomCupertinoThemeData _getCupertinoTheme(String key) {
+  CustomCupertinoThemeData _getCupertinoThemeData(String key) {
     return widget.cupertinoThemes.containsKey(key)
         ? widget.cupertinoThemes[key]
         : null;
@@ -233,7 +249,7 @@ class CustomThemeState extends State<CustomTheme> {
           setState(() {
             _light = lightTheme;
           });
-          sharedPrefs.setString('default-light', key);
+          sharedPrefs.setString('${widget.prefix}-default-light', key);
         }
       }
       setState(() {
@@ -242,10 +258,10 @@ class CustomThemeState extends State<CustomTheme> {
           _mode = ThemeMode.dark;
         }
       });
-      sharedPrefs.setString('default-dark', themeKey);
+      sharedPrefs.setString('${widget.prefix}-default-dark', themeKey);
       if (apply) {
-        sharedPrefs.setBool('dark-mode', true);
-        sharedPrefs.setBool('follow-system', false);
+        sharedPrefs.setBool('${widget.prefix}-dark-mode', true);
+        sharedPrefs.setBool('${widget.prefix}-follow-system', false);
       }
     } else {
       if (both) {
@@ -256,7 +272,7 @@ class CustomThemeState extends State<CustomTheme> {
           setState(() {
             _dark = darkTheme;
           });
-          sharedPrefs.setString('default-dark', key);
+          sharedPrefs.setString('${widget.prefix}-default-dark', key);
         }
       }
       setState(() {
@@ -265,28 +281,32 @@ class CustomThemeState extends State<CustomTheme> {
           _mode = ThemeMode.light;
         }
       });
-      sharedPrefs.setString('default-light', themeKey);
+      sharedPrefs.setString('${widget.prefix}-default-light', themeKey);
       if (apply) {
-        sharedPrefs.setBool('dark-mode', false);
-        sharedPrefs.setBool('follow-system', false);
+        sharedPrefs.setBool('${widget.prefix}-dark-mode', false);
+        sharedPrefs.setBool('${widget.prefix}-follow-system', false);
       }
     }
+    setState(() {
+      _currentThemeKey = themeKey;
+    });
   }
 
   /// set default theme for [cupertinoTheme]
   void setCupertinoTheme(String themeKey) {
     // print(themeKey);
     setState(() {
-      _cupertinoTheme = _getCupertinoTheme(themeKey);
+      _cupertinoTheme = _getCupertinoThemeData(themeKey);
       _currentCupertinoThemeKey = themeKey;
     });
-    sharedPrefs.setString('default-cupertino', themeKey);
+    sharedPrefs.setString('${widget.prefix}-default-cupertino', themeKey);
   }
 
   /// set default theme for [lightTheme]
   void setLightTheme(String themeKey) {
     setState(() {
       _light = _getTheme(themeKey);
+      _currentThemeKey = themeKey;
     });
   }
 
@@ -294,6 +314,7 @@ class CustomThemeState extends State<CustomTheme> {
   void setDarkTheme(String themeKey) {
     setState(() {
       _dark = _getTheme(themeKey);
+      _currentThemeKey = themeKey;
     });
   }
 
@@ -304,8 +325,9 @@ class CustomThemeState extends State<CustomTheme> {
     });
 
     if (sharedPrefs != null) {
-      sharedPrefs.setBool('dark-mode', _mode == ThemeMode.dark);
-      sharedPrefs.setBool('follow-system', false);
+      sharedPrefs.setBool(
+          '${widget.prefix}-dark-mode', _mode == ThemeMode.dark);
+      sharedPrefs.setBool('${widget.prefix}-follow-system', false);
     }
   }
 
@@ -325,17 +347,18 @@ class CustomThemeState extends State<CustomTheme> {
             ? ThemeMode.system
             : checkDark() ? ThemeMode.dark : ThemeMode.light;
       } else {
-        final isDark = sharedPrefs.getBool('dark-mode');
+        final isDark = sharedPrefs.getBool('${widget.prefix}-dark-mode');
         _mode = value
             ? ThemeMode.system
-            : isDark ? ThemeMode.dark : ThemeMode.light;
+            : isDark != null && isDark ? ThemeMode.dark : ThemeMode.light;
       }
     });
 
     if (sharedPrefs != null) {
-      sharedPrefs.setBool('follow-system', value);
+      sharedPrefs.setBool('${widget.prefix}-follow-system', value);
       if (widget.keepOnDisableFollow)
-        sharedPrefs.setBool('dark-mode', _mode == ThemeMode.dark);
+        sharedPrefs.setBool(
+            '${widget.prefix}-dark-mode', _mode == ThemeMode.dark);
     }
   }
 
@@ -360,6 +383,15 @@ class CustomThemeState extends State<CustomTheme> {
     return checkDark()
         ? widget.themes[key].key == _dark.key
         : widget.themes[key].key == _light.key;
+  }
+
+  /// get [CustomThemeData] of current theme.
+  ///
+  /// make sure [_mediaContext] is not null before using these function.
+  CustomThemeData getCurrentThemeData() {
+    final currentKey =
+        widget.themes.keys.firstWhere((key) => checkIfCurrent(key));
+    return widget.themes[currentKey];
   }
 
   /// [key] is [themeKey]
@@ -416,12 +448,14 @@ class CustomThemeState extends State<CustomTheme> {
 
   /// reset every settings, Go back to hard coded settings.
   Future<void> resetSettings() async {
-    await sharedPrefs.remove('dark-mode');
-    await sharedPrefs.remove('follow-system');
-    await sharedPrefs.remove('default-light');
-    await sharedPrefs.remove('default-dark');
-    await sharedPrefs.remove('default-cupertino');
+    await sharedPrefs.remove('${widget.prefix}-dark-mode');
+    await sharedPrefs.remove('${widget.prefix}-follow-system');
+    await sharedPrefs.remove('${widget.prefix}-default-light');
+    await sharedPrefs.remove('${widget.prefix}-default-dark');
+    await sharedPrefs.remove('${widget.prefix}-default-cupertino');
     // Todo: set values to defaults
+
+    print('All Deleted');
   }
 
   @override

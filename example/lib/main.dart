@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:custom_theming/custom_theme.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(
@@ -35,54 +38,119 @@ void main() {
 
 class MyApp extends StatelessWidget {
   final isCupertino = false;
+  final multiTheme = true;
   @override
   Widget build(BuildContext context) {
     // final CustomData a = MyThemes.data['key'][theme.CUSTOM];
     // print(a.text);
-    if (isCupertino)
-      return CupertinoApp(
-        debugShowCheckedModeBanner: false,
-        theme: CustomTheme.of(context).cupertinoTheme,
-        initialRoute: "/",
-        title: 'Theming',
-        color: Theme.of(context).primaryColor,
-        home: CupertinoStoreHomePage(),
-        builder: (context, child) {
-          CustomTheme.of(context).setMediaContext(context);
-          CustomTheme.of(context).generateCupertinoTheme(
-            key: 'generated',
-            data: CustomCupertinoThemeData(
-                name: 'Generated on Build',
-                createdBy: 'Dev',
-                themeData: CupertinoThemeData().copyWith(
-                  primaryColor: Colors.purple,
-                )),
-          );
-          return child;
-        },
-      );
-    else
+    if (multiTheme)
       return MaterialApp(
-        debugShowCheckedModeBanner: false,
         theme: CustomTheme.of(context).lightTheme,
         darkTheme: CustomTheme.of(context).darkTheme,
         themeMode: CustomTheme.of(context).themeMode,
-        initialRoute: "/",
-        title: 'Theming',
-        color: Theme.of(context).primaryColor,
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text(CustomTheme.of(context).currentThemeKey ?? ''),
+            leading: IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () => CustomTheme.of(context).setTheme(
+                CustomTheme.of(context).themes.keys.toList()[Random().nextInt(
+                  CustomTheme.of(context).themes.keys.toList().length,
+                )],
+                apply: true,
+              ),
+            ),
+          ),
+          body: CustomTheme(
+            prefix: '2nd',
+            defaultLightTheme: 'default-light',
+            defaultDarkTheme: 'default-dark',
+            defaultCupertinoTheme: 'default',
+            themeMode: ThemeMode.dark,
+            themes: MyThemes.themes,
+            keepOnDisableFollow: false,
+            child: TestMaterial(),
+          ),
+        ),
         builder: (context, child) {
-          // print('app build context');
           CustomTheme.of(context).setMediaContext(context);
-          CustomTheme.of(context).generateTheme(
-            key: 'generated-theme',
-            name: 'Generated Theme',
-            createdBy: '',
-            data: ThemeData.dark().copyWith(),
-          );
           return child;
         },
       );
+    if (isCupertino)
+      return TestCupertino();
+    else
+      return TestMaterial();
+  }
+}
+
+class TestMaterial extends StatelessWidget {
+  const TestMaterial({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Future.delayed(Duration(seconds: 1), () {
+    //   CustomTheme.of(context).resetSettings();
+    // });
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: CustomTheme.of(context).lightTheme,
+      darkTheme: CustomTheme.of(context).darkTheme,
+      themeMode: CustomTheme.of(context).themeMode,
+      initialRoute: "/",
+      title: 'Theming',
+      color: Theme.of(context).primaryColor,
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      builder: (context, child) {
+        // print('app build context');
+        CustomTheme.of(context).setMediaContext(context);
+        CustomTheme.of(context).generateTheme(
+          key: 'generated-theme',
+          name: 'Generated Theme',
+          createdBy: '',
+          data: ThemeData.dark().copyWith(),
+        );
+        return child;
+      },
+    );
+  }
+}
+
+class TestCupertino extends StatelessWidget {
+  const TestCupertino({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoApp(
+      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+        DefaultMaterialLocalizations.delegate,
+        DefaultWidgetsLocalizations.delegate,
+        DefaultCupertinoLocalizations.delegate,
+      ],
+      debugShowCheckedModeBanner: false,
+      theme: CustomTheme.of(context).cupertinoTheme,
+      initialRoute: "/",
+      title: 'Theming',
+      color: Theme.of(context).primaryColor,
+      home: CupertinoStoreHomePage(),
+      builder: (context, child) {
+        CustomTheme.of(context).setMediaContext(context);
+        CustomTheme.of(context).generateCupertinoTheme(
+          key: 'generated',
+          data: CustomCupertinoThemeData(
+              name: 'Generated on Build',
+              createdBy: 'Dev',
+              themeData: CupertinoThemeData().copyWith(
+                primaryColor: Colors.purple,
+              )),
+        );
+        return child;
+      },
+    );
   }
 }
 
