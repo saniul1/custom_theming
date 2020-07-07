@@ -24,9 +24,9 @@ class CustomTheme extends StatefulWidget {
   final String defaultDarkTheme;
   final String defaultCupertinoTheme;
   final ThemeMode themeMode;
-  final Map<String, ThemeData> themes;
-  final Map<String, CupertinoThemeData> cupertinoThemes;
   final bool keepOnDisableFollow;
+  Map<String, ThemeData> themes;
+  Map<String, CupertinoThemeData> cupertinoThemes;
 
   /// [CustomTheme] needs to be on top of [MaterialApp] or [CupertinoApp],
   ///
@@ -42,7 +42,7 @@ class CustomTheme extends StatefulWidget {
   /// hard code some default setting for [defaultLightTheme], [defaultDarkTheme], [themeMode]
   ///
   /// set [keepOnDisableFollow] to [true] to keep current applied theme even if [themeMode] changes from [ThemeMode.system]
-  const CustomTheme({
+  CustomTheme({
     Key key,
     this.defaultLightTheme,
     this.defaultDarkTheme,
@@ -276,19 +276,26 @@ class CustomThemeState extends State<CustomTheme> {
     }
   }
 
-  /// check if a theme is currently default or not.
-  bool checkIfDefault(String key) {
-    return widget.themes[key] == _light || widget.themes[key] == _dark;
-  }
-
   /// check if current theme is dark or not.
-  /// if [themeMode] is [ThemeMode.system] check current [ThemeMode] on the running machine.
+  /// if [themeMode] is [ThemeMode.system] check current [ThemeMode] of [system].
   bool checkDark() {
     final Brightness systemBrightnessValue =
         MediaQuery.of(_mediaContext).platformBrightness;
     return _mode == ThemeMode.system
         ? systemBrightnessValue == Brightness.dark
         : _mode == ThemeMode.dark;
+  }
+
+  /// check if a theme is currently default or not.
+  // ! returns true for (all) themes with the same properties.
+  bool checkIfDefault(String key) {
+    return widget.themes[key] == _light || widget.themes[key] == _dark;
+  }
+
+  /// check if a theme is currently default or not.
+  // ? returns true for (all) themes with the same properties.
+  bool checkIfDefaultCupertino(String key) {
+    return widget.cupertinoThemes[key] == _cupertinoTheme;
   }
 
   /// sets [currentThemeKey] to currently applied theme
@@ -299,6 +306,21 @@ class CustomThemeState extends State<CustomTheme> {
           : widget.themes.keys
               .firstWhere((key) => widget.themes[key] == _light);
     });
+  }
+
+  /// [key] is [themeKey]
+  void generateTheme(
+      {@required String key, @required ThemeData data, dynamic customData}) {
+    widget.themes[key] = data;
+  }
+
+  /// [key] is [themeKey]
+  void generateCupertinoTheme({
+    @required String key,
+    @required CupertinoThemeData data,
+    dynamic customData,
+  }) {
+    widget.cupertinoThemes[key] = data;
   }
 
   /// reset every settings, Go back to hard coded settings.

@@ -50,6 +50,10 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
         CustomTheme.of(context).setMediaContext(context);
+        CustomTheme.of(context).generateTheme(
+          key: 'generated-theme',
+          data: ThemeData().copyWith(primaryColor: Colors.blueGrey),
+        );
         return child;
       },
     );
