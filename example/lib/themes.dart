@@ -1,20 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:custom_theming/custom_theme.dart';
 
 class MyThemes {
-  static final Map<String, ThemeData> themes = {
-    'default-dark': ThemeData.dark(),
-    'default-light': ThemeData.light(),
-    'default-light2': ThemeData.light().copyWith(
-      primaryColor: Colors.teal,
+  static final Map<String, CustomThemeData> themes = {
+    'default-dark': CustomThemeData(
+      name: 'Default Dark',
+      createdBy: '',
+      themeData: ThemeData.dark(),
     ),
-    'darker-dark': ThemeData.dark().copyWith(
-      primaryColor: Colors.black,
+    'default-light': CustomThemeData(
+      name: 'Default Light',
+      createdBy: '',
+      themeData: ThemeData(),
     ),
-    'test*dark': ThemeData.dark().copyWith(
-      primaryColor: Colors.grey,
+    'default-light2': CustomThemeData(
+      name: 'Default Light 2',
+      createdBy: '',
+      themeData: ThemeData().copyWith(
+        primaryColor: Colors.teal,
+      ),
     ),
-    'test*light': ThemeData.light().copyWith(
-      primaryColor: Colors.pink,
+    'darker-dark': CustomThemeData(
+      name: 'Darker Dark',
+      createdBy: '',
+      themeData: ThemeData.dark().copyWith(
+        primaryColor: Colors.black,
+      ),
+    ),
+    'test*dark': CustomThemeData(
+      name: 'Test Dark',
+      createdBy: '',
+      themeData: ThemeData.dark().copyWith(
+        primaryColor: Colors.grey,
+      ),
+    ),
+    'test*light': CustomThemeData(
+      name: 'Test Light',
+      createdBy: '',
+      themeData: ThemeData.light().copyWith(
+        primaryColor: Colors.pink,
+      ),
     ),
   };
 }

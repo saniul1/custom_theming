@@ -12,9 +12,20 @@ void main() {
       themeMode: ThemeMode.dark,
       themes: MyThemes.themes,
       cupertinoThemes: {
-        'default': CupertinoThemeData().copyWith(primaryColor: Colors.amber),
-        'green': CupertinoThemeData().copyWith(primaryColor: Colors.green),
-        'red': CupertinoThemeData().copyWith(primaryColor: Colors.red),
+        'default': CustomCupertinoThemeData(
+            name: 'Default',
+            createdBy: 'Dev',
+            themeData:
+                CupertinoThemeData().copyWith(primaryColor: Colors.amber)),
+        'green': CustomCupertinoThemeData(
+            name: 'Green',
+            createdBy: 'Dev',
+            themeData:
+                CupertinoThemeData().copyWith(primaryColor: Colors.green)),
+        'red': CustomCupertinoThemeData(
+            name: 'Red',
+            createdBy: 'Dev',
+            themeData: CupertinoThemeData().copyWith(primaryColor: Colors.red)),
       },
       keepOnDisableFollow: false,
       child: MyApp(),
@@ -23,40 +34,55 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final isCupertino = false;
   @override
   Widget build(BuildContext context) {
-    // return CupertinoApp(
-    //   debugShowCheckedModeBanner: false,
-    //   theme: CustomTheme.of(context).cupertinoTheme,
-    //   // darkTheme: CustomTheme.of(context).darkTheme,
-    //   // themeMode: CustomTheme.of(context).themeMode,
-    //   initialRoute: "/",
-    //   title: 'Theming',
-    //   color: Theme.of(context).primaryColor,
-    //   home: CupertinoStoreHomePage(),
-    //   builder: (context, child) {
-    //     CustomTheme.of(context).setMediaContext(context);
-    //     return child;
-    //   },
-    // );
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: CustomTheme.of(context).lightTheme,
-      darkTheme: CustomTheme.of(context).darkTheme,
-      themeMode: CustomTheme.of(context).themeMode,
-      initialRoute: "/",
-      title: 'Theming',
-      color: Theme.of(context).primaryColor,
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-      builder: (context, child) {
-        CustomTheme.of(context).setMediaContext(context);
-        CustomTheme.of(context).generateTheme(
-          key: 'generated-theme',
-          data: ThemeData().copyWith(primaryColor: Colors.blueGrey),
-        );
-        return child;
-      },
-    );
+    // final CustomData a = MyThemes.data['key'][theme.CUSTOM];
+    // print(a.text);
+    if (isCupertino)
+      return CupertinoApp(
+        debugShowCheckedModeBanner: false,
+        theme: CustomTheme.of(context).cupertinoTheme,
+        initialRoute: "/",
+        title: 'Theming',
+        color: Theme.of(context).primaryColor,
+        home: CupertinoStoreHomePage(),
+        builder: (context, child) {
+          CustomTheme.of(context).setMediaContext(context);
+          CustomTheme.of(context).generateCupertinoTheme(
+            key: 'generated',
+            data: CustomCupertinoThemeData(
+                name: 'Generated on Build',
+                createdBy: 'Dev',
+                themeData: CupertinoThemeData().copyWith(
+                  primaryColor: Colors.purple,
+                )),
+          );
+          return child;
+        },
+      );
+    else
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: CustomTheme.of(context).lightTheme,
+        darkTheme: CustomTheme.of(context).darkTheme,
+        themeMode: CustomTheme.of(context).themeMode,
+        initialRoute: "/",
+        title: 'Theming',
+        color: Theme.of(context).primaryColor,
+        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        builder: (context, child) {
+          // print('app build context');
+          CustomTheme.of(context).setMediaContext(context);
+          CustomTheme.of(context).generateTheme(
+            key: 'generated-theme',
+            name: 'Generated Theme',
+            createdBy: '',
+            data: ThemeData.dark().copyWith(),
+          );
+          return child;
+        },
+      );
   }
 }
 
@@ -90,7 +116,43 @@ class CupertinoStoreHomePage extends StatelessWidget {
           case 0:
             returnValue = CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
-                child: SizedBox(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: CustomTheme.of(context)
+                      .cupertinoThemes
+                      .keys
+                      .map((themeKey) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 100.0,
+                        vertical: 5,
+                      ),
+                      child: CupertinoButton(
+                        onPressed: () =>
+                            CustomTheme.of(context).setCupertinoTheme(themeKey),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                CustomTheme.of(context)
+                                    .cupertinoThemes[themeKey]
+                                    .name,
+                              ),
+                            ),
+                          ],
+                        ),
+                        color:
+                            CustomTheme.of(context).currentCupertinoThemeKey ==
+                                    themeKey
+                                ? Colors.green
+                                : Colors.blue,
+                      ),
+                    );
+                  }).toList(),
+                ),
               );
             });
             break;
@@ -125,14 +187,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,13 +197,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Text(
-            //   'You have pushed the button this many times:',
-            // ),
-            // Text(
-            //   '$_counter',
-            //   style: Theme.of(context).textTheme.headline4,
-            // ),
             Center(
               child: Switch(
                 value: CustomTheme.of(context).checkDark(),
@@ -174,25 +221,27 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             Column(
-              children: CustomTheme.of(context).themes.keys.map((theme) {
+              children: CustomTheme.of(context).themes.keys.map((themeKey) {
                 return RaisedButton(
                   onPressed: () => CustomTheme.of(context)
-                      .setTheme(theme, both: true, apply: true),
+                      .setTheme(themeKey, both: true, apply: true),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (CustomTheme.of(context).checkIfDefault(theme))
+                      if (CustomTheme.of(context).checkIfDefault(themeKey))
                         Icon(
                           Icons.star,
                           size: 14,
                         ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(theme),
+                        child: Text(
+                          CustomTheme.of(context).themes[themeKey].name,
+                        ),
                       ),
                     ],
                   ),
-                  color: CustomTheme.of(context).currentThemeKey == theme
+                  color: CustomTheme.of(context).checkIfCurrent(themeKey)
                       ? Colors.green
                       : Colors.blue,
                 );
@@ -202,7 +251,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
+      //   onPressed: () {},
       //   tooltip: 'Increment',
       //   child: Icon(Icons.add),
       // ),
