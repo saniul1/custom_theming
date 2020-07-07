@@ -10,5 +10,11 @@ class MyThemes {
     'darker-dark': ThemeData.dark().copyWith(
       primaryColor: Colors.black,
     ),
+    'test*dark': ThemeData.dark().copyWith(
+      primaryColor: Colors.grey,
+    ),
+    'test*light': ThemeData.light().copyWith(
+      primaryColor: Colors.pink,
+    ),
   };
 }

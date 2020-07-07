@@ -37,7 +37,7 @@ class CustomTheme extends StatefulWidget {
   ///   return child;
   /// },
   /// ```
-  /// pass [themes] using a map [Map<String, ThemeData>] and use key of [map] as [themeName]
+  /// pass [themes] using a map [Map<String, ThemeData>] and use key of [map] as [themeKey]
   ///
   /// hard code some default setting for [defaultLightTheme], [defaultDarkTheme], [themeMode]
   ///
@@ -69,7 +69,9 @@ class CustomThemeState extends State<CustomTheme> {
 
   BuildContext _mediaContext;
 
-  String _currentThemeName;
+  String _currentThemeKey;
+
+  CupertinoThemeData _cupertinoTheme;
 
   ThemeData _light;
 
@@ -77,13 +79,9 @@ class CustomThemeState extends State<CustomTheme> {
 
   ThemeMode _mode;
 
-  CupertinoThemeData _cupertinoTheme;
-
   Map<String, ThemeData> get themes => widget.themes;
 
   Map<String, CupertinoThemeData> get cupertinoThemes => widget.cupertinoThemes;
-
-  String get currentThemeName => _currentThemeName;
 
   CupertinoThemeData get cupertinoTheme => _cupertinoTheme;
 
@@ -93,10 +91,14 @@ class CustomThemeState extends State<CustomTheme> {
 
   ThemeMode get themeMode => _mode;
 
+  /// get [themeKey] of currently applied theme.
+  String get currentThemeKey => _currentThemeKey;
+
   void setMediaContext(BuildContext ctx) {
     _mediaContext = ctx;
   }
 
+  // set default settings either from hard code or from system storage or server.
   @override
   void initState() {
     _light = _getTheme(widget.defaultLightTheme);
@@ -147,9 +149,29 @@ class CustomThemeState extends State<CustomTheme> {
   /// to apply them straightaway set [apply] to [true]
   ///
   /// Note: Doing this changes [themeMode] to [ThemeMode.dark] or [ThemeMode.light] based on the theme selected, even if [themeMode] was [ThemeMode.system]
-  void setTheme(String themeKey, {bool apply = false}) {
+  ///
+  /// set [both] to [true] to set related theme to [darkTheme] or [lightTheme],
+  /// if no related theme found keeps the previous theme.
+  ///
+  /// Note: To apply related theme correctly [themeKey] needs to be correctly configured in  [themes] data passed on to [CustomTheme].
+  ///
+  /// follow these kind of structure for related themes [example-light], [example-dark] or [vary_simple_light_theme], [vary_simple_dark_theme].
+  /// Don't use camel cases in [themeKey] like [exampleLight], [exampleDark].
+  void setTheme(String themeKey, {bool apply = false, bool both = false}) {
     final theme = _getTheme(themeKey);
     if (theme.brightness == Brightness.dark) {
+      if (both) {
+        final lKey = themeKey.replaceAll('dark', 'light');
+        final lightTheme = lKey != themeKey
+            ? widget.themes.containsKey(lKey) ? widget.themes[lKey] : null
+            : null;
+        if (lightTheme != null) {
+          setState(() {
+            _light = lightTheme;
+          });
+          sharedPrefs.setString('default-light', lKey);
+        }
+      }
       setState(() {
         _dark = _getTheme(themeKey);
         if (apply) {
@@ -162,6 +184,18 @@ class CustomThemeState extends State<CustomTheme> {
         sharedPrefs.setBool('follow-system', false);
       }
     } else {
+      if (both) {
+        final dKey = themeKey.replaceAll('light', 'dark');
+        final darkTheme = dKey != themeKey
+            ? widget.themes.containsKey(dKey) ? widget.themes[dKey] : null
+            : null;
+        if (darkTheme != null) {
+          setState(() {
+            _dark = darkTheme;
+          });
+          sharedPrefs.setString('default-dark', dKey);
+        }
+      }
       setState(() {
         _light = _getTheme(themeKey);
         if (apply) {
@@ -219,17 +253,8 @@ class CustomThemeState extends State<CustomTheme> {
     _setCurrentTheme();
   }
 
-  /// sets [currentThemeName] to currently applied theme
-  void _setCurrentTheme() {
-    setState(() {
-      _currentThemeName = checkDark()
-          ? widget.themes.keys.firstWhere((key) => widget.themes[key] == _dark)
-          : widget.themes.keys
-              .firstWhere((key) => widget.themes[key] == _light);
-    });
-  }
-
-  /// change [themeMode] value to [ThemeMode.system] by setting [value] to [true] or [false] to [ThemeMode.dark] | [ThemeMode.light]
+  /// set [themeMode] value to [ThemeMode.system] by passing [true],
+  /// or pass [false] to change [themeMode] to [ThemeMode.dark] or [ThemeMode.light]
   void setThemeModeToSystem(bool value) {
     setState(() {
       if (widget.keepOnDisableFollow) {
@@ -257,13 +282,23 @@ class CustomThemeState extends State<CustomTheme> {
   }
 
   /// check if current theme is dark or not.
-  /// check for [system] if [themeMode] is [ThemeMode.system]
+  /// if [themeMode] is [ThemeMode.system] check current [ThemeMode] on the running machine.
   bool checkDark() {
     final Brightness systemBrightnessValue =
         MediaQuery.of(_mediaContext).platformBrightness;
     return _mode == ThemeMode.system
         ? systemBrightnessValue == Brightness.dark
         : _mode == ThemeMode.dark;
+  }
+
+  /// sets [currentThemeKey] to currently applied theme
+  void _setCurrentTheme() {
+    setState(() {
+      _currentThemeKey = checkDark()
+          ? widget.themes.keys.firstWhere((key) => widget.themes[key] == _dark)
+          : widget.themes.keys
+              .firstWhere((key) => widget.themes[key] == _light);
+    });
   }
 
   /// reset every settings, Go back to hard coded settings.

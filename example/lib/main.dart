@@ -25,34 +25,34 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-      debugShowCheckedModeBanner: false,
-      theme: CustomTheme.of(context).cupertinoTheme,
-      // darkTheme: CustomTheme.of(context).darkTheme,
-      // themeMode: CustomTheme.of(context).themeMode,
-      initialRoute: "/",
-      title: 'Theming',
-      color: Theme.of(context).primaryColor,
-      home: CupertinoStoreHomePage(),
-      builder: (context, child) {
-        CustomTheme.of(context).setMediaContext(context);
-        return child;
-      },
-    );
-    // return MaterialApp(
+    // return CupertinoApp(
     //   debugShowCheckedModeBanner: false,
-    //   theme: CustomTheme.of(context).lightTheme,
-    //   darkTheme: CustomTheme.of(context).darkTheme,
-    //   themeMode: CustomTheme.of(context).themeMode,
+    //   theme: CustomTheme.of(context).cupertinoTheme,
+    //   // darkTheme: CustomTheme.of(context).darkTheme,
+    //   // themeMode: CustomTheme.of(context).themeMode,
     //   initialRoute: "/",
     //   title: 'Theming',
     //   color: Theme.of(context).primaryColor,
-    //   home: MyHomePage(title: 'Flutter Demo Home Page'),
+    //   home: CupertinoStoreHomePage(),
     //   builder: (context, child) {
     //     CustomTheme.of(context).setMediaContext(context);
     //     return child;
     //   },
     // );
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: CustomTheme.of(context).lightTheme,
+      darkTheme: CustomTheme.of(context).darkTheme,
+      themeMode: CustomTheme.of(context).themeMode,
+      initialRoute: "/",
+      title: 'Theming',
+      color: Theme.of(context).primaryColor,
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      builder: (context, child) {
+        CustomTheme.of(context).setMediaContext(context);
+        return child;
+      },
+    );
   }
 }
 
@@ -132,9 +132,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text(widget.title),
-      // ),
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -172,7 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
             Column(
               children: CustomTheme.of(context).themes.keys.map((theme) {
                 return RaisedButton(
-                  onPressed: () => CustomTheme.of(context).setTheme(theme),
+                  onPressed: () => CustomTheme.of(context)
+                      .setTheme(theme, both: true, apply: true),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -187,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ],
                   ),
-                  color: CustomTheme.of(context).currentThemeName == theme
+                  color: CustomTheme.of(context).currentThemeKey == theme
                       ? Colors.green
                       : Colors.blue,
                 );
