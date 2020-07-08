@@ -1,7 +1,5 @@
 import 'dart:math';
-
 import 'package:custom_theming/custom_theme.dart';
-import 'package:example/routes.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,7 +23,7 @@ void main() {
 class MyApp extends StatelessWidget {
   final onlyWidgetApp = false;
   final isMultiTheme = true;
-  final isCupertino = true;
+  final isCupertino = false;
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
@@ -34,15 +32,23 @@ class MyApp extends StatelessWidget {
 
     if (onlyWidgetApp)
       return WidgetsApp(
-        onGenerateRoute: generate,
-        onUnknownRoute: unKnownRoute,
-        initialRoute: "/",
-        title: 'Test',
-        color: Theme.of(context).primaryColor,
-        builder: (context, child) {
+        builder: (context, int) {
           CustomTheme.of(context).setMediaContext(context);
-          return child;
+          return Container(
+            color: CustomTheme.themeOf(context).themeData.canvasColor,
+            child: Center(
+              child: RaisedButton(
+                onPressed: CustomTheme.of(context).toggleDarkMode,
+                child: Text(
+                  'Hello, world!',
+                  textDirection: TextDirection.ltr,
+                ),
+              ),
+            ),
+          );
         },
+        // color: Colors.red,
+        color: CustomTheme.themeOf(context).themeData.primaryColor,
       );
 
     if (isMultiTheme && !isCupertino)
