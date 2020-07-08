@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:custom_theming/custom_theme.dart';
+import 'package:example/routes.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,22 +15,7 @@ void main() {
       defaultCupertinoTheme: 'default',
       themeMode: ThemeMode.dark,
       themes: MyThemes.themes,
-      cupertinoThemes: {
-        'default': CustomCupertinoThemeData(
-            name: 'Default',
-            createdBy: 'Dev',
-            themeData:
-                CupertinoThemeData().copyWith(primaryColor: Colors.amber)),
-        'green': CustomCupertinoThemeData(
-            name: 'Green',
-            createdBy: 'Dev',
-            themeData:
-                CupertinoThemeData().copyWith(primaryColor: Colors.green)),
-        'red': CustomCupertinoThemeData(
-            name: 'Red',
-            createdBy: 'Dev',
-            themeData: CupertinoThemeData().copyWith(primaryColor: Colors.red)),
-      },
+      cupertinoThemes: MyThemes.cupertinoThemes,
       keepOnDisableFollow: false,
       child: MyApp(),
     ),
@@ -37,13 +23,29 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final isCupertino = false;
-  final multiTheme = true;
+  final onlyWidgetApp = false;
+  final isMultiTheme = true;
+  final isCupertino = true;
   @override
   Widget build(BuildContext context) {
-    // final CustomData a = MyThemes.data['key'][theme.CUSTOM];
-    // print(a.text);
-    if (multiTheme)
+    // Future.delayed(Duration(seconds: 1), () {
+    //   CustomTheme.of(context).resetSettings();
+    // });
+
+    if (onlyWidgetApp)
+      return WidgetsApp(
+        onGenerateRoute: generate,
+        onUnknownRoute: unKnownRoute,
+        initialRoute: "/",
+        title: 'Test',
+        color: Theme.of(context).primaryColor,
+        builder: (context, child) {
+          CustomTheme.of(context).setMediaContext(context);
+          return child;
+        },
+      );
+
+    if (isMultiTheme && !isCupertino)
       return MaterialApp(
         theme: CustomTheme.of(context).lightTheme,
         darkTheme: CustomTheme.of(context).darkTheme,
@@ -65,7 +67,6 @@ class MyApp extends StatelessWidget {
             prefix: '2nd',
             defaultLightTheme: 'default-light',
             defaultDarkTheme: 'default-dark',
-            defaultCupertinoTheme: 'default',
             themeMode: ThemeMode.dark,
             themes: MyThemes.themes,
             keepOnDisableFollow: false,
@@ -77,7 +78,83 @@ class MyApp extends StatelessWidget {
           return child;
         },
       );
-    if (isCupertino)
+    else if (isMultiTheme && isCupertino)
+      return CupertinoApp(
+        // localizationsDelegates: <LocalizationsDelegate<dynamic>>[
+        //   DefaultMaterialLocalizations.delegate,
+        //   // DefaultWidgetsLocalizations.delegate,
+        //   // DefaultCupertinoLocalizations.delegate,
+        // ],
+        theme: CustomTheme.of(context).cupertinoTheme,
+
+        home: CupertinoPageScaffold(
+          child: Stack(
+            children: [
+              CustomTheme(
+                prefix: '2nd',
+                defaultCupertinoTheme: 'default',
+                cupertinoThemes: MyThemes.cupertinoThemes,
+                keepOnDisableFollow: false,
+                child: TestCupertino(),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16.0),
+                    color: CustomTheme.cupertinoThemeOf(context)
+                        .themeData
+                        .primaryColor,
+                  ),
+                  child: Column(
+                    children: [
+                      CupertinoButton(
+                        child: Icon(
+                          Icons.refresh,
+                          color: CustomTheme.cupertinoThemeOf(context)
+                              .themeData
+                              .primaryContrastingColor,
+                        ),
+                        onPressed: () =>
+                            CustomTheme.of(context).setCupertinoTheme(
+                          CustomTheme.of(context)
+                              .cupertinoThemes
+                              .keys
+                              .toList()[Random().nextInt(
+                            CustomTheme.of(context)
+                                .cupertinoThemes
+                                .keys
+                                .toList()
+                                .length,
+                          )],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          CustomTheme.of(context).currentCupertinoThemeKey,
+                          style: TextStyle(
+                            color: CustomTheme.cupertinoThemeOf(context)
+                                .themeData
+                                .primaryContrastingColor,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        builder: (context, child) {
+          CustomTheme.of(context).setMediaContext(context);
+          // print(CupertinoTheme.of(context).primaryColor.hashCode);
+          return child;
+        },
+      );
+    else if (isCupertino)
       return TestCupertino();
     else
       return TestMaterial();
@@ -91,9 +168,6 @@ class TestMaterial extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Future.delayed(Duration(seconds: 1), () {
-    //   CustomTheme.of(context).resetSettings();
-    // });
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: CustomTheme.of(context).lightTheme,
@@ -126,11 +200,6 @@ class TestCupertino extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
-      localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-        DefaultMaterialLocalizations.delegate,
-        DefaultWidgetsLocalizations.delegate,
-        DefaultCupertinoLocalizations.delegate,
-      ],
       debugShowCheckedModeBanner: false,
       theme: CustomTheme.of(context).cupertinoTheme,
       initialRoute: "/",
@@ -142,11 +211,12 @@ class TestCupertino extends StatelessWidget {
         CustomTheme.of(context).generateCupertinoTheme(
           key: 'generated',
           data: CustomCupertinoThemeData(
-              name: 'Generated on Build',
-              createdBy: 'Dev',
-              themeData: CupertinoThemeData().copyWith(
-                primaryColor: Colors.purple,
-              )),
+            name: 'Generated on Build',
+            createdBy: 'Dev',
+            themeData: CupertinoThemeData().copyWith(
+              primaryColor: Colors.purple,
+            ),
+          ),
         );
         return child;
       },
@@ -215,7 +285,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                         color:
                             CustomTheme.of(context).currentCupertinoThemeKey ==
                                     themeKey
-                                ? Colors.green
+                                ? CupertinoTheme.of(context).primaryColor
                                 : Colors.blue,
                       ),
                     );
@@ -268,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Center(
               child: Switch(
                 value: CustomTheme.of(context).checkDark(),
-                onChanged: CustomTheme.of(context).toggleDarkMode,
+                onChanged: (_) => CustomTheme.of(context).toggleDarkMode(),
                 activeTrackColor: Colors.lightGreenAccent,
                 activeColor: Colors.green,
               ),

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:custom_theming/custom_theme.dart';
 
@@ -41,5 +42,25 @@ class MyThemes {
         primaryColor: Colors.pink,
       ),
     ),
+  };
+  static final Map<String, CustomCupertinoThemeData> cupertinoThemes = {
+    'default': CustomCupertinoThemeData(
+        name: 'Default',
+        createdBy: 'Dev',
+        themeData: CupertinoThemeData().copyWith(
+          primaryColor: Colors.amber,
+        )),
+    'green': CustomCupertinoThemeData(
+        name: 'Green',
+        createdBy: 'Dev',
+        themeData: CupertinoThemeData().copyWith(
+          primaryColor: Colors.green,
+        )),
+    'red': CustomCupertinoThemeData(
+        name: 'Red',
+        createdBy: 'Dev',
+        themeData: CupertinoThemeData().copyWith(
+          primaryColor: Colors.red,
+        )),
   };
 }

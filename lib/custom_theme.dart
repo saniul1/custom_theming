@@ -83,11 +83,11 @@ class CustomTheme extends StatefulWidget {
   /// [cupertinoThemes] does not support [themeMode]. it always follow system setting.
   CustomTheme({
     Key key,
-    this.prefix = '',
-    this.defaultLightTheme,
-    this.defaultDarkTheme,
-    this.defaultCupertinoTheme,
-    this.themeMode,
+    this.prefix = 'app',
+    this.defaultLightTheme = 'default-light',
+    this.defaultDarkTheme = 'default-dark',
+    this.defaultCupertinoTheme = 'default',
+    this.themeMode = ThemeMode.system,
     this.themes,
     this.cupertinoThemes,
     this.keepOnDisableFollow = false,
@@ -101,6 +101,19 @@ class CustomTheme extends StatefulWidget {
     _CustomTheme inherited =
         (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
     return inherited.data;
+  }
+
+  static CustomThemeData themeOf(BuildContext context) {
+    _CustomTheme inherited =
+        (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
+    return inherited.data.themes[inherited.data.currentThemeKey];
+  }
+
+  static CustomCupertinoThemeData cupertinoThemeOf(BuildContext context) {
+    _CustomTheme inherited =
+        (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
+    return inherited
+        .data.cupertinoThemes[inherited.data.currentCupertinoThemeKey];
   }
 }
 
@@ -147,7 +160,7 @@ class CustomThemeState extends State<CustomTheme> {
   // set default settings either from hard code or from system storage or server.
   @override
   void initState() {
-    if (widget.themes == null)
+    if (widget.themes == null) {
       widget.themes = {
         'default-light': CustomThemeData(
           key: 'default-light',
@@ -157,26 +170,36 @@ class CustomThemeState extends State<CustomTheme> {
         ),
         'default-dark': CustomThemeData(
           key: 'default-dark',
-          name: 'Default Light',
+          name: 'Default Dark',
           createdBy: '',
           themeData: ThemeData.dark(),
         ),
       };
+    }
     widget.themes.forEach((key, value) {
       value.key = key;
     });
-    if (widget.cupertinoThemes == null)
+    //
+    if (widget.cupertinoThemes == null) {
       widget.cupertinoThemes = {
         'default': CustomCupertinoThemeData(
-          name: 'default',
+          key: 'default',
+          name: 'Default',
           createdBy: '',
           themeData: CupertinoThemeData(),
         ),
       };
-    _light = _getTheme(widget.defaultLightTheme);
-    _dark = _getTheme(widget.defaultDarkTheme);
+    }
+    widget.cupertinoThemes.forEach((key, value) {
+      value.key = key;
+    });
+    //
+    _light = _getThemeData(widget.defaultLightTheme);
+    _dark = _getThemeData(widget.defaultDarkTheme);
     _cupertinoTheme = _getCupertinoThemeData(widget.defaultCupertinoTheme);
+    _currentCupertinoThemeKey = widget.defaultCupertinoTheme;
     _mode = widget.themeMode;
+    //
     SharedPreferences.getInstance().then((prefs) {
       sharedPrefs = prefs;
       final isDark = sharedPrefs.getBool('${widget.prefix}-dark-mode');
@@ -186,34 +209,26 @@ class CustomThemeState extends State<CustomTheme> {
       final dDark = sharedPrefs.getString('${widget.prefix}-default-dark');
       final dCupertino =
           sharedPrefs.getString('${widget.prefix}-default-cupertino');
+      //
       if (dCupertino != null &&
           widget.cupertinoThemes.containsKey(dCupertino)) {
-        _cupertinoTheme = widget.cupertinoThemes[dCupertino];
-        _currentCupertinoThemeKey = dCupertino;
+        setCupertinoTheme(dCupertino);
       }
       if (dLight != null && widget.themes.containsKey(dLight))
-        _light = widget.themes[dLight];
+        setLightTheme(dLight);
       if (dDark != null && widget.themes.containsKey(dDark))
-        _dark = widget.themes[dDark];
-      // print("Theme: followSystem - $followSystem, isDark -$isDark");
+        setDarkTheme(dDark);
       if (followSystem != null && !followSystem) setDarkMode(isDark ?? false);
       if (followSystem != null && followSystem) {
-        setState(() {
-          _mode = ThemeMode.system;
-        });
+        setThemeModeToSystem(true);
       }
-    });
-    Future.delayed(Duration(milliseconds: 0), () {
-      setState(() {
-        _currentThemeKey = getCurrentThemeData().key;
-      });
     });
     super.initState();
   }
 
   /// get [ThemeData] by [key] name of [themes]
   /// returns [null] if theme not found
-  CustomThemeData _getTheme(String key) {
+  CustomThemeData _getThemeData(String key) {
     return widget.themes.containsKey(key) ? widget.themes[key] : null;
   }
 
@@ -239,57 +254,22 @@ class CustomThemeState extends State<CustomTheme> {
   /// follow these kind of structure for related themes [example-light], [example-dark] or [vary_simple_light_theme], [vary_simple_dark_theme].
   /// Don't use camel cases in [themeKey] like [exampleLight], [exampleDark].
   void setTheme(String themeKey, {bool apply = false, bool both = false}) {
-    final theme = _getTheme(themeKey).themeData;
+    final theme = _getThemeData(themeKey).themeData;
     if (theme.brightness == Brightness.dark) {
       if (both) {
         final key = themeKey.replaceAll('dark', 'light');
-        final CustomThemeData lightTheme =
-            key == themeKey ? null : _getTheme(key);
-        if (lightTheme != null) {
-          setState(() {
-            _light = lightTheme;
-          });
-          sharedPrefs.setString('${widget.prefix}-default-light', key);
-        }
+        if (widget.themes.containsKey(key)) setLightTheme(key);
       }
-      setState(() {
-        _dark = _getTheme(themeKey);
-        if (apply) {
-          _mode = ThemeMode.dark;
-        }
-      });
-      sharedPrefs.setString('${widget.prefix}-default-dark', themeKey);
-      if (apply) {
-        sharedPrefs.setBool('${widget.prefix}-dark-mode', true);
-        sharedPrefs.setBool('${widget.prefix}-follow-system', false);
-      }
+      setDarkTheme(themeKey, apply: apply);
+      if (apply) setDarkMode(true);
     } else {
       if (both) {
         final key = themeKey.replaceAll('light', 'dark');
-        final CustomThemeData darkTheme =
-            key == themeKey ? null : _getTheme(key);
-        if (darkTheme != null) {
-          setState(() {
-            _dark = darkTheme;
-          });
-          sharedPrefs.setString('${widget.prefix}-default-dark', key);
-        }
+        if (widget.themes.containsKey(key)) setDarkTheme(key);
       }
-      setState(() {
-        _light = _getTheme(themeKey);
-        if (apply) {
-          _mode = ThemeMode.light;
-        }
-      });
-      sharedPrefs.setString('${widget.prefix}-default-light', themeKey);
-      if (apply) {
-        sharedPrefs.setBool('${widget.prefix}-dark-mode', false);
-        sharedPrefs.setBool('${widget.prefix}-follow-system', false);
-      }
+      setLightTheme(themeKey, apply: apply);
+      if (apply) setDarkMode(false);
     }
-    setState(() {
-      _currentThemeKey = themeKey;
-    });
   }
 
   /// set default theme for [cupertinoTheme]
@@ -303,23 +283,27 @@ class CustomThemeState extends State<CustomTheme> {
   }
 
   /// set default theme for [lightTheme]
-  void setLightTheme(String themeKey) {
+  void setLightTheme(String themeKey, {bool apply = false}) {
     setState(() {
-      _light = _getTheme(themeKey);
-      _currentThemeKey = themeKey;
+      _light = _getThemeData(themeKey);
+      if (apply) _currentThemeKey = themeKey;
     });
+    if (sharedPrefs != null)
+      sharedPrefs.setString('${widget.prefix}-default-light', themeKey);
   }
 
   /// set default theme for [darkTheme]
-  void setDarkTheme(String themeKey) {
+  void setDarkTheme(String themeKey, {bool apply = false}) {
     setState(() {
-      _dark = _getTheme(themeKey);
-      _currentThemeKey = themeKey;
+      _dark = _getThemeData(themeKey);
+      if (apply) _currentThemeKey = themeKey;
     });
+    if (sharedPrefs != null)
+      sharedPrefs.setString('${widget.prefix}-default-dark', themeKey);
   }
 
   /// toggle between [ThemeMode.dark] and [ThemeMode.light]
-  void toggleDarkMode(bool _) {
+  void toggleDarkMode() {
     setState(() {
       _mode = checkDark() ? ThemeMode.light : ThemeMode.dark;
     });
@@ -336,6 +320,10 @@ class CustomThemeState extends State<CustomTheme> {
     setState(() {
       _mode = value ? ThemeMode.dark : ThemeMode.light;
     });
+    if (sharedPrefs != null) {
+      sharedPrefs.setBool('${widget.prefix}-dark-mode', value);
+      sharedPrefs.setBool('${widget.prefix}-follow-system', false);
+    }
   }
 
   /// set [themeMode] value to [ThemeMode.system] by passing [true],
@@ -362,7 +350,7 @@ class CustomThemeState extends State<CustomTheme> {
     }
   }
 
-  /// check if current theme is dark or not.
+  /// check current theme is dark or not.
   /// if [themeMode] is [ThemeMode.system] check current [ThemeMode] of [system].
   bool checkDark() {
     final Brightness systemBrightnessValue =
@@ -373,25 +361,16 @@ class CustomThemeState extends State<CustomTheme> {
   }
 
   /// check if a theme is currently default or not.
-  // ! returns true for (all) themes with the same properties.
   bool checkIfDefault(String key) {
     return widget.themes[key].key == _light.key ||
         widget.themes[key].key == _dark.key;
   }
 
+  /// check if theme is currently applied
   bool checkIfCurrent(String key) {
     return checkDark()
         ? widget.themes[key].key == _dark.key
         : widget.themes[key].key == _light.key;
-  }
-
-  /// get [CustomThemeData] of current theme.
-  ///
-  /// make sure [_mediaContext] is not null before using these function.
-  CustomThemeData getCurrentThemeData() {
-    final currentKey =
-        widget.themes.keys.firstWhere((key) => checkIfCurrent(key));
-    return widget.themes[currentKey];
   }
 
   /// [key] is [themeKey]
