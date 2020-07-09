@@ -2,6 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'custom_cupertino_theme_data.dart';
+import 'custom_theme_data.dart';
+
+export './custom_theme_data.dart';
+export './custom_cupertino_theme_data.dart';
+
 class _CustomTheme extends InheritedWidget {
   final CustomThemeState data;
 
@@ -15,40 +21,6 @@ class _CustomTheme extends InheritedWidget {
   bool updateShouldNotify(_CustomTheme oldWidget) {
     return true;
   }
-}
-
-class CustomThemeData {
-  /// **Warning:** Never set value outside of class.
-  /// *Internal use only*
-  String key;
-  final String name;
-  final String createdBy;
-  final ThemeData themeData;
-  final dynamic customData;
-  CustomThemeData({
-    this.key,
-    @required this.name,
-    @required this.createdBy,
-    @required this.themeData,
-    this.customData,
-  });
-}
-
-class CustomCupertinoThemeData {
-  /// **Warning:** Never set value outside of class.
-  /// *Internal use only*
-  String key;
-  final String name;
-  final String createdBy;
-  final CupertinoThemeData themeData;
-  final dynamic customData;
-  CustomCupertinoThemeData({
-    this.key,
-    @required this.name,
-    @required this.createdBy,
-    @required this.themeData,
-    this.customData,
-  });
 }
 
 /// Base class
@@ -170,9 +142,14 @@ class CustomThemeState extends State<CustomTheme> {
         ),
       };
     } else {
-      _themes = widget.themes;
-      _themes.forEach((key, value) {
-        value.key = key;
+      _themes = Map();
+      widget.themes.forEach((key, value) {
+        _themes[key] = CustomThemeData(
+          key: key,
+          name: value.name ?? '',
+          createdBy: value.createdBy ?? '',
+          themeData: value.themeData,
+        );
       });
     }
     //
@@ -186,9 +163,14 @@ class CustomThemeState extends State<CustomTheme> {
         ),
       };
     } else {
-      _cupertinoThemes = widget.cupertinoThemes;
-      _cupertinoThemes.forEach((key, value) {
-        value.key = key;
+      _cupertinoThemes = Map();
+      widget.cupertinoThemes.forEach((key, value) {
+        _cupertinoThemes[key] = CustomCupertinoThemeData(
+          key: key,
+          name: value.name ?? '',
+          createdBy: value.createdBy ?? '',
+          themeData: value.themeData,
+        );
       });
     }
     //

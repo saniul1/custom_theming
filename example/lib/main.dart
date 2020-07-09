@@ -21,9 +21,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final noAppWidget = true;
+  final noAppWidget = false;
   final onlyWidgetApp = false;
-  final isMultiTheme = false;
+  final isMultiTheme = true;
   final isCupertino = false;
   @override
   Widget build(BuildContext context) {
@@ -113,7 +113,9 @@ class MyApp extends StatelessWidget {
         themeMode: CustomTheme.of(context).themeMode,
         home: Scaffold(
           appBar: AppBar(
-            title: Text(CustomTheme.of(context).currentThemeKey ?? ''),
+            title: Text(
+                "${CustomTheme.of(context).currentThemeKey} / ${CustomTheme.of(context).themes.length}" ??
+                    ''),
             leading: IconButton(
               icon: Icon(Icons.refresh),
               onPressed: () => CustomTheme.of(context).setTheme(
@@ -157,7 +159,7 @@ class MyApp extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: 100,
+                  height: 130,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16.0),
                     color: CustomTheme.cupertinoThemeOf(context)
@@ -166,6 +168,12 @@ class MyApp extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "${1}/${CustomTheme.of(context).cupertinoThemes.length.toString()}",
+                        ),
+                      ),
                       CupertinoButton(
                         child: Icon(
                           Icons.refresh,
