@@ -24,12 +24,19 @@ class MyApp extends StatelessWidget {
   final noAppWidget = false;
   final onlyWidgetApp = false;
   final isMultiTheme = true;
-  final isCupertino = false;
+  final isCupertino = true;
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
     //   CustomTheme.of(context).resetSettings();
     // });
+    CustomTheme.of(context).generateTheme(
+      themeKey: 'null',
+      name: 'null',
+      createdBy: 'null',
+      data: null,
+      customData: Name(name: 'Custom Theming'),
+    );
     if (noAppWidget)
       return Container(
         color: CustomTheme.themeOf(context).themeData.canvasColor,
@@ -55,7 +62,7 @@ class MyApp extends StatelessWidget {
                     .themeData
                     .primaryColor,
                 onPressed: () => CustomTheme.of(context)
-                    .setTheme(themeKey, apply: true, both: true),
+                    .setTheme(themeKey, apply: true, both: false),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -82,6 +89,19 @@ class MyApp extends StatelessWidget {
                 ),
               );
             }).toList(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                CustomTheme.customDataOf<Name>(context)?.name ?? 'Nothing!',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                CustomTheme.customDataOf<Name>(context)?.no?.toString() ??
+                    'Nothing!!',
+              ),
+            )
           ]),
         ),
       );
@@ -171,7 +191,7 @@ class MyApp extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "${1}/${CustomTheme.of(context).cupertinoThemes.length.toString()}",
+                          "${CustomTheme.customCupertinoDataOf<Name>(context)?.no ?? -1}/${CustomTheme.of(context).cupertinoThemes.length.toString()}",
                         ),
                       ),
                       CupertinoButton(
@@ -239,7 +259,7 @@ class TestMaterial extends StatelessWidget {
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
         CustomTheme.of(context).generateTheme(
-          key: 'generated-theme',
+          themeKey: 'generated-theme',
           name: 'Generated Theme',
           createdBy: '',
           data: ThemeData.dark().copyWith(),
@@ -266,15 +286,13 @@ class TestCupertino extends StatelessWidget {
       home: CupertinoStoreHomePage(),
       builder: (context, child) {
         CustomTheme.of(context).generateCupertinoTheme(
-          key: 'generated',
-          data: CustomCupertinoThemeData(
+            themeKey: 'generated',
             name: 'Generated on Build',
             createdBy: 'Dev',
-            themeData: CupertinoThemeData().copyWith(
+            data: CupertinoThemeData().copyWith(
               primaryColor: Colors.purple,
             ),
-          ),
-        );
+            customData: Name(name: 'created By Dev', no: 9000));
         return child;
       },
     );
@@ -354,7 +372,26 @@ class CupertinoStoreHomePage extends StatelessWidget {
           case 1:
             returnValue = CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
-                child: SizedBox(),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          CustomTheme.customCupertinoDataOf<Name>(context)
+                                  ?.no
+                                  ?.toString() ??
+                              'Nothing!',
+                        ),
+                        Text(
+                          CustomTheme.customCupertinoDataOf<Name>(context)
+                                  ?.name ??
+                              'Nothing!',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               );
             });
             break;

@@ -5,6 +5,11 @@ class CustomThemeData {
   final String name;
   final String createdBy;
   final ThemeData themeData;
+
+  /// Don't access [customData] from [CustomThemeData] directly. instead use
+  /// ```
+  /// CustomTheme.customDataOf<Type>(context)
+  /// ```
   final dynamic customData;
   CustomThemeData({
     this.key,

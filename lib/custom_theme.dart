@@ -84,6 +84,31 @@ class CustomTheme extends StatefulWidget {
     return inherited
         .data.cupertinoThemes[inherited.data.currentCupertinoThemeKey];
   }
+
+  /// [customData] could be null.
+  /// always check for null before using.
+  /// ```
+  /// CustomTheme.customDataOf<ExampleClass>(context)?.example ?? null
+  /// ```
+  static T customDataOf<T>(BuildContext context) {
+    _CustomTheme inherited =
+        (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
+    print(
+        inherited.data.customData.containsKey(inherited.data.currentThemeKey));
+    return inherited.data.customData[inherited.data.currentThemeKey] as T;
+  }
+
+  /// [customCupertinoData] could be null.
+  /// always check for null before using.
+  /// ```
+  /// CustomTheme.customCupertinoDataOf<ExampleClass>(context)?.example ?? null
+  /// ```
+  static T customCupertinoDataOf<T>(BuildContext context) {
+    _CustomTheme inherited =
+        (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
+    return inherited
+        .data.customCupertinoData[inherited.data.currentCupertinoThemeKey] as T;
+  }
 }
 
 class CustomThemeState extends State<CustomTheme> {
@@ -91,9 +116,13 @@ class CustomThemeState extends State<CustomTheme> {
 
   BuildContext _mediaContext;
 
-  Map<String, CustomThemeData> _themes;
+  Map<String, CustomThemeData> _themes = Map();
 
-  Map<String, CustomCupertinoThemeData> _cupertinoThemes;
+  Map<String, CustomCupertinoThemeData> _cupertinoThemes = Map();
+
+  Map<String, dynamic> _customData = Map();
+
+  Map<String, dynamic> _customCupertinoData = Map();
 
   String _currentLightThemeKey;
 
@@ -106,6 +135,10 @@ class CustomThemeState extends State<CustomTheme> {
   Map<String, CustomThemeData> get themes => _themes;
 
   Map<String, CustomCupertinoThemeData> get cupertinoThemes => _cupertinoThemes;
+
+  Map<String, dynamic> get customData => _customData;
+
+  Map<String, dynamic> get customCupertinoData => _customCupertinoData;
 
   CupertinoThemeData get cupertinoTheme =>
       _cupertinoThemes[_currentCupertinoThemeKey]?.themeData ?? null;
@@ -142,14 +175,14 @@ class CustomThemeState extends State<CustomTheme> {
         ),
       };
     } else {
-      _themes = Map();
       widget.themes.forEach((key, value) {
         _themes[key] = CustomThemeData(
           key: key,
           name: value.name ?? '',
           createdBy: value.createdBy ?? '',
-          themeData: value.themeData,
+          themeData: value.themeData ?? ThemeData(),
         );
+        if (value.customData != null) _customData[key] = value.customData;
       });
     }
     //
@@ -163,14 +196,15 @@ class CustomThemeState extends State<CustomTheme> {
         ),
       };
     } else {
-      _cupertinoThemes = Map();
       widget.cupertinoThemes.forEach((key, value) {
         _cupertinoThemes[key] = CustomCupertinoThemeData(
           key: key,
           name: value.name ?? '',
           createdBy: value.createdBy ?? '',
-          themeData: value.themeData,
+          themeData: value.themeData ?? CupertinoThemeData(),
         );
+        if (value.customData != null)
+          _customCupertinoData[key] = value.customData;
       });
     }
     //
@@ -341,10 +375,7 @@ class CustomThemeState extends State<CustomTheme> {
         : key == _currentLightThemeKey;
   }
 
-  /// [key] is [themeKey]
-  ///
-  /// theme can be generated anywhere on the app but the best place to make new theme is in
-  /// [MaterialApp]. like these -
+  /// Make sure [CustomTheme] exist in the widget tree, above of the widget where you are trying to add new themes.
   /// ```
   /// builder: (context, child) {
   ///   ...
@@ -356,41 +387,49 @@ class CustomThemeState extends State<CustomTheme> {
   /// },
   /// ```
   void generateTheme({
-    @required String key,
+    @required String themeKey,
     @required String name,
     @required String createdBy,
     @required ThemeData data,
     dynamic customData,
   }) {
-    _themes[key] = CustomThemeData(
-      key: key,
-      name: name,
-      createdBy: createdBy,
-      themeData: data,
-    );
-    // print('theme generated!');
+    if (themeKey != null)
+      _themes[themeKey] = CustomThemeData(
+        key: themeKey,
+        name: name ?? '',
+        createdBy: createdBy ?? '',
+        themeData: data ?? ThemeData(),
+      );
+    if (customData != null && themeKey != null)
+      _customData[themeKey] = customData;
   }
 
-  /// [key] is [themeKey]
-  ///
-  /// theme can be generated anywhere on the app but the best place to make new cupertino theme is in
-  /// [CupertinoApp]. like these -
+  /// Make sure [CustomTheme] exist in the widget tree, above of the widget where you are trying to add new themes.
   /// ```
   /// builder: (context, child) {
   ///   ...
   ///   CustomTheme.of(context).generateTheme(
   ///     key: <themeKey>,
-  ///     data: <ThemeData>,
+  ///     data: <CupertinoThemeData>,
   ///   );
   ///   return child;
   /// },
   /// ```
   void generateCupertinoTheme({
-    @required String key,
-    @required CustomCupertinoThemeData data,
+    @required String themeKey,
+    @required String name,
+    @required String createdBy,
+    @required CupertinoThemeData data,
     dynamic customData,
   }) {
-    _cupertinoThemes[key] = data;
+    _cupertinoThemes[themeKey] = CustomCupertinoThemeData(
+        key: themeKey,
+        name: name ?? '',
+        createdBy: createdBy ?? '',
+        themeData: data ?? CupertinoThemeData(),
+        customData: customData);
+    if (customData != null && themeKey != null)
+      _customCupertinoData[themeKey] = customData;
   }
 
   /// reset every settings, Go back to hard coded settings.
