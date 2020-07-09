@@ -199,13 +199,13 @@ class CustomThemeState extends State<CustomTheme> {
     //
     SharedPreferences.getInstance().then((prefs) {
       _sharedPrefs = prefs;
-      final isDark = _sharedPrefs.getBool('${widget.prefix}-dark-mode');
+      final isDark = _sharedPrefs?.getBool('${widget.prefix}-dark-mode');
       final followSystem =
-          _sharedPrefs.getBool('${widget.prefix}-follow-system');
-      final dLight = _sharedPrefs.getString('${widget.prefix}-default-light');
-      final dDark = _sharedPrefs.getString('${widget.prefix}-default-dark');
+          _sharedPrefs?.getBool('${widget.prefix}-follow-system');
+      final dLight = _sharedPrefs?.getString('${widget.prefix}-default-light');
+      final dDark = _sharedPrefs?.getString('${widget.prefix}-default-dark');
       final dCupertino =
-          _sharedPrefs.getString('${widget.prefix}-default-cupertino');
+          _sharedPrefs?.getString('${widget.prefix}-default-cupertino');
       //
       if (dCupertino != null && _cupertinoThemes.containsKey(dCupertino))
         _currentCupertinoThemeKey = dCupertino;
@@ -281,8 +281,7 @@ class CustomThemeState extends State<CustomTheme> {
     setState(() {
       _currentCupertinoThemeKey = themeKey;
     });
-    if (_sharedPrefs != null)
-      _sharedPrefs.setString('${widget.prefix}-default-cupertino', themeKey);
+    _sharedPrefs?.setString('${widget.prefix}-default-cupertino', themeKey);
   }
 
   /// set default theme for [lightTheme]
@@ -290,8 +289,7 @@ class CustomThemeState extends State<CustomTheme> {
     setState(() {
       _currentLightThemeKey = themeKey;
     });
-    if (_sharedPrefs != null)
-      _sharedPrefs.setString('${widget.prefix}-default-light', themeKey);
+    _sharedPrefs?.setString('${widget.prefix}-default-light', themeKey);
   }
 
   /// set default theme for [darkTheme]
@@ -299,21 +297,12 @@ class CustomThemeState extends State<CustomTheme> {
     setState(() {
       _currentDarkThemeKey = themeKey;
     });
-    if (_sharedPrefs != null)
-      _sharedPrefs.setString('${widget.prefix}-default-dark', themeKey);
+    _sharedPrefs?.setString('${widget.prefix}-default-dark', themeKey);
   }
 
   /// toggle between [ThemeMode.dark] and [ThemeMode.light]
   void toggleDarkMode() {
-    final isDark = checkDark();
-    setState(() {
-      _mode = isDark ? ThemeMode.light : ThemeMode.dark;
-    });
-    if (_sharedPrefs != null) {
-      _sharedPrefs.setBool(
-          '${widget.prefix}-dark-mode', _mode == ThemeMode.dark);
-      _sharedPrefs.setBool('${widget.prefix}-follow-system', false);
-    }
+    setDarkMode(!checkDark());
   }
 
   /// set [themeMode] to [ThemeMode.dark] or [ThemeMode.light] by passing [value]
@@ -321,10 +310,8 @@ class CustomThemeState extends State<CustomTheme> {
     setState(() {
       _mode = value ? ThemeMode.dark : ThemeMode.light;
     });
-    if (_sharedPrefs != null) {
-      _sharedPrefs.setBool('${widget.prefix}-dark-mode', value);
-      _sharedPrefs.setBool('${widget.prefix}-follow-system', false);
-    }
+    _sharedPrefs?.setBool('${widget.prefix}-dark-mode', value);
+    _sharedPrefs?.setBool('${widget.prefix}-follow-system', false);
   }
 
   /// set [themeMode] value to [ThemeMode.system] by passing [true],
@@ -336,19 +323,17 @@ class CustomThemeState extends State<CustomTheme> {
             ? ThemeMode.system
             : checkDark() ? ThemeMode.dark : ThemeMode.light;
       } else {
-        final isDark = _sharedPrefs.getBool('${widget.prefix}-dark-mode');
+        final isDark = _sharedPrefs?.getBool('${widget.prefix}-dark-mode');
         _mode = value
             ? ThemeMode.system
             : isDark != null && isDark ? ThemeMode.dark : ThemeMode.light;
       }
     });
 
-    if (_sharedPrefs != null) {
-      _sharedPrefs.setBool('${widget.prefix}-follow-system', value);
-      if (widget.keepOnDisableFollow)
-        _sharedPrefs.setBool(
-            '${widget.prefix}-dark-mode', _mode == ThemeMode.dark);
-    }
+    _sharedPrefs?.setBool('${widget.prefix}-follow-system', value);
+    if (widget.keepOnDisableFollow)
+      _sharedPrefs?.setBool(
+          '${widget.prefix}-dark-mode', _mode == ThemeMode.dark);
   }
 
   /// check current theme is dark or not.
@@ -370,8 +355,8 @@ class CustomThemeState extends State<CustomTheme> {
   /// check if theme is currently applied
   bool checkIfCurrent(String key) {
     return checkDark()
-        ? _themes[key].key == _currentDarkThemeKey
-        : _themes[key].key == _currentLightThemeKey;
+        ? key == _currentDarkThemeKey
+        : key == _currentLightThemeKey;
   }
 
   /// [key] is [themeKey]
@@ -428,11 +413,11 @@ class CustomThemeState extends State<CustomTheme> {
 
   /// reset every settings, Go back to hard coded settings.
   Future<void> resetSettings() async {
-    await _sharedPrefs.remove('${widget.prefix}-dark-mode');
-    await _sharedPrefs.remove('${widget.prefix}-follow-system');
-    await _sharedPrefs.remove('${widget.prefix}-default-light');
-    await _sharedPrefs.remove('${widget.prefix}-default-dark');
-    await _sharedPrefs.remove('${widget.prefix}-default-cupertino');
+    await _sharedPrefs?.remove('${widget.prefix}-dark-mode');
+    await _sharedPrefs?.remove('${widget.prefix}-follow-system');
+    await _sharedPrefs?.remove('${widget.prefix}-default-light');
+    await _sharedPrefs?.remove('${widget.prefix}-default-dark');
+    await _sharedPrefs?.remove('${widget.prefix}-default-cupertino');
     // Todo: set values to defaults
 
     print('All Deleted');

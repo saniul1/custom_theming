@@ -21,7 +21,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final noAppWidget = false;
+  final noAppWidget = true;
   final onlyWidgetApp = false;
   final isMultiTheme = false;
   final isCupertino = false;
@@ -54,8 +54,8 @@ class MyApp extends StatelessWidget {
                     .themes[themeKey]
                     .themeData
                     .primaryColor,
-                onPressed: () =>
-                    CustomTheme.of(context).setTheme(themeKey, apply: true),
+                onPressed: () => CustomTheme.of(context)
+                    .setTheme(themeKey, apply: true, both: true),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -72,6 +72,12 @@ class MyApp extends StatelessWidget {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
+                    if (CustomTheme.of(context).checkIfCurrent(themeKey))
+                      Icon(
+                        Icons.done_outline,
+                        size: 14,
+                        color: Colors.amber,
+                      ),
                   ],
                 ),
               );
