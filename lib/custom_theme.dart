@@ -93,8 +93,6 @@ class CustomTheme extends StatefulWidget {
   static T customDataOf<T>(BuildContext context) {
     _CustomTheme inherited =
         (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
-    print(
-        inherited.data.customData.containsKey(inherited.data.currentThemeKey));
     return inherited.data.customData[inherited.data.currentThemeKey] as T;
   }
 
@@ -136,8 +134,19 @@ class CustomThemeState extends State<CustomTheme> {
 
   Map<String, CustomCupertinoThemeData> get cupertinoThemes => _cupertinoThemes;
 
+  /// [key] could be absent in the map.
+  /// always check for null before using.
+  /// ```
+  /// CustomTheme.of(context).customData[key] ?? null
+  /// ```
   Map<String, dynamic> get customData => _customData;
 
+  /// [key] could be absent in the map.
+  /// always check for null before using.
+  /// ```
+  /// CustomTheme.of(context).customCupertinoData[key] ?? null
+
+  /// ```
   Map<String, dynamic> get customCupertinoData => _customCupertinoData;
 
   CupertinoThemeData get cupertinoTheme =>
@@ -277,14 +286,14 @@ class CustomThemeState extends State<CustomTheme> {
     if (theme.brightness == Brightness.dark) {
       if (both) {
         final key = themeKey.replaceAll('dark', 'light');
-        if (_themes.containsKey(key)) setLightTheme(key);
+        if (key != themeKey && _themes.containsKey(key)) setLightTheme(key);
       }
       setDarkTheme(themeKey, apply: apply);
       if (apply) setDarkMode(true);
     } else {
       if (both) {
         final key = themeKey.replaceAll('light', 'dark');
-        if (_themes.containsKey(key)) setDarkTheme(key);
+        if (key != themeKey && _themes.containsKey(key)) setDarkTheme(key);
       }
       setLightTheme(themeKey, apply: apply);
       if (apply) setDarkMode(false);

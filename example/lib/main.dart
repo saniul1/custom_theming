@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   final noAppWidget = false;
   final onlyWidgetApp = false;
   final isMultiTheme = true;
-  final isCupertino = true;
+  final isCupertino = false;
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
@@ -286,13 +286,17 @@ class TestCupertino extends StatelessWidget {
       home: CupertinoStoreHomePage(),
       builder: (context, child) {
         CustomTheme.of(context).generateCupertinoTheme(
-            themeKey: 'generated',
-            name: 'Generated on Build',
-            createdBy: 'Dev',
-            data: CupertinoThemeData().copyWith(
-              primaryColor: Colors.purple,
-            ),
-            customData: Name(name: 'created By Dev', no: 9000));
+          themeKey: 'generated',
+          name: 'Generated on Build',
+          createdBy: 'Dev',
+          data: CupertinoThemeData().copyWith(
+            primaryColor: Colors.purple,
+          ),
+          customData: Name(name: 'created By Dev', no: 9000),
+        );
+        final Name name = CustomTheme.of(context).customCupertinoData[
+            CustomTheme.of(context).currentCupertinoThemeKey];
+        print(name?.no ?? -1);
         return child;
       },
     );

@@ -74,7 +74,7 @@ class MyThemes {
       themeData: CupertinoThemeData().copyWith(
         primaryColor: Colors.red,
       ),
-      customData: Name(no: 3),
+      // customData: Name(no: 3),
     ),
   };
 }
