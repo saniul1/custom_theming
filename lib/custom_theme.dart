@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class _CustomTheme extends InheritedWidget {
-  final better data;
+  final CustomThemeState data;
 
   _CustomTheme({
     this.data,
@@ -92,9 +92,9 @@ class CustomTheme extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  better createState() => new better();
+  CustomThemeState createState() => new CustomThemeState();
 
-  static better of(BuildContext context) {
+  static CustomThemeState of(BuildContext context) {
     _CustomTheme inherited =
         (context.dependOnInheritedWidgetOfExactType<_CustomTheme>());
     return inherited.data;
@@ -114,7 +114,7 @@ class CustomTheme extends StatefulWidget {
   }
 }
 
-class better extends State<CustomTheme> {
+class CustomThemeState extends State<CustomTheme> {
   SharedPreferences _sharedPrefs;
 
   BuildContext _mediaContext;
@@ -126,8 +126,6 @@ class better extends State<CustomTheme> {
   String _currentLightThemeKey;
 
   String _currentDarkThemeKey;
-
-  String _currentThemeKey;
 
   String _currentCupertinoThemeKey;
 
@@ -150,7 +148,8 @@ class better extends State<CustomTheme> {
   String get currentCupertinoThemeKey => _currentCupertinoThemeKey;
 
   /// get [themeKey] of currently applied theme.
-  String get currentThemeKey => _currentThemeKey;
+  String get currentThemeKey =>
+      checkDark() ? _currentDarkThemeKey : _currentLightThemeKey;
 
   // set default settings either from hard code or from system storage or server.
   @override
@@ -227,8 +226,6 @@ class better extends State<CustomTheme> {
       debugShowCheckedModeBanner: false,
       builder: (context, int) {
         _mediaContext = context;
-        _currentThemeKey =
-            checkDark() ? _currentDarkThemeKey : _currentLightThemeKey;
         return _CustomTheme(
           data: this,
           child: widget.child,
@@ -292,7 +289,6 @@ class better extends State<CustomTheme> {
   void setLightTheme(String themeKey, {bool apply = false}) {
     setState(() {
       _currentLightThemeKey = themeKey;
-      if (apply) _currentThemeKey = themeKey;
     });
     if (_sharedPrefs != null)
       _sharedPrefs.setString('${widget.prefix}-default-light', themeKey);
@@ -302,7 +298,6 @@ class better extends State<CustomTheme> {
   void setDarkTheme(String themeKey, {bool apply = false}) {
     setState(() {
       _currentDarkThemeKey = themeKey;
-      if (apply) _currentThemeKey = themeKey;
     });
     if (_sharedPrefs != null)
       _sharedPrefs.setString('${widget.prefix}-default-dark', themeKey);
@@ -313,7 +308,6 @@ class better extends State<CustomTheme> {
     final isDark = checkDark();
     setState(() {
       _mode = isDark ? ThemeMode.light : ThemeMode.dark;
-      _currentThemeKey = isDark ? _currentDarkThemeKey : _currentLightThemeKey;
     });
     if (_sharedPrefs != null) {
       _sharedPrefs.setBool(
@@ -326,7 +320,6 @@ class better extends State<CustomTheme> {
   void setDarkMode(bool value) {
     setState(() {
       _mode = value ? ThemeMode.dark : ThemeMode.light;
-      _currentThemeKey = value ? _currentDarkThemeKey : _currentLightThemeKey;
     });
     if (_sharedPrefs != null) {
       _sharedPrefs.setBool('${widget.prefix}-dark-mode', value);
@@ -348,8 +341,6 @@ class better extends State<CustomTheme> {
             ? ThemeMode.system
             : isDark != null && isDark ? ThemeMode.dark : ThemeMode.light;
       }
-      _currentThemeKey =
-          checkDark() ? _currentDarkThemeKey : _currentLightThemeKey;
     });
 
     if (_sharedPrefs != null) {

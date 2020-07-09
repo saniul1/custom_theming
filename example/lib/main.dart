@@ -21,10 +21,10 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final noAppWidget = true;
+  final noAppWidget = false;
   final onlyWidgetApp = false;
   final isMultiTheme = false;
-  final isCupertino = true;
+  final isCupertino = false;
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
@@ -34,13 +34,49 @@ class MyApp extends StatelessWidget {
       return Container(
         color: CustomTheme.themeOf(context).themeData.canvasColor,
         child: Center(
-          child: RaisedButton(
-            onPressed: CustomTheme.of(context).toggleDarkMode,
-            child: Text(
-              'Hello, world!',
-              textDirection: TextDirection.ltr,
+          child: Column(children: [
+            Container(
+              color: CustomTheme.themeOf(context).themeData.primaryColor,
+              height: 100,
+              child: Center(
+                child: RaisedButton(
+                  onPressed: CustomTheme.of(context).toggleDarkMode,
+                  child: Text(
+                    'Toggle',
+                    textDirection: TextDirection.ltr,
+                  ),
+                ),
+              ),
             ),
-          ),
+            ...CustomTheme.of(context).themes.keys.map((themeKey) {
+              return RaisedButton(
+                color: CustomTheme.of(context)
+                    .themes[themeKey]
+                    .themeData
+                    .primaryColor,
+                onPressed: () =>
+                    CustomTheme.of(context).setTheme(themeKey, apply: true),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (CustomTheme.of(context).checkIfDefault(themeKey))
+                      Icon(
+                        Icons.star,
+                        size: 14,
+                        color: Colors.yellow,
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        CustomTheme.of(context).themes[themeKey].name,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ]),
         ),
       );
     if (onlyWidgetApp)
