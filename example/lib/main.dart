@@ -11,7 +11,7 @@ void main() {
       defaultLightTheme: 'default-light',
       defaultDarkTheme: 'default-dark',
       defaultCupertinoTheme: 'default',
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.system,
       themes: MyThemes.themes,
       cupertinoThemes: MyThemes.cupertinoThemes,
       keepOnDisableFollow: false,
@@ -21,19 +21,32 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final noAppWidget = true;
   final onlyWidgetApp = false;
-  final isMultiTheme = true;
-  final isCupertino = false;
+  final isMultiTheme = false;
+  final isCupertino = true;
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
     //   CustomTheme.of(context).resetSettings();
     // });
-
+    if (noAppWidget)
+      return Container(
+        color: CustomTheme.themeOf(context).themeData.canvasColor,
+        child: Center(
+          child: RaisedButton(
+            onPressed: CustomTheme.of(context).toggleDarkMode,
+            child: Text(
+              'Hello, world!',
+              textDirection: TextDirection.ltr,
+            ),
+          ),
+        ),
+      );
     if (onlyWidgetApp)
       return WidgetsApp(
+        title: 'Theming',
         builder: (context, int) {
-          CustomTheme.of(context).setMediaContext(context);
           return Container(
             color: CustomTheme.themeOf(context).themeData.canvasColor,
             child: Center(
@@ -47,8 +60,8 @@ class MyApp extends StatelessWidget {
             ),
           );
         },
-        // color: Colors.red,
-        color: CustomTheme.themeOf(context).themeData.primaryColor,
+        color: Colors.red,
+        // color: CustomTheme.themeOf(context).themeData.primaryColor,
       );
 
     if (isMultiTheme && !isCupertino)
@@ -79,10 +92,6 @@ class MyApp extends StatelessWidget {
             child: TestMaterial(),
           ),
         ),
-        builder: (context, child) {
-          CustomTheme.of(context).setMediaContext(context);
-          return child;
-        },
       );
     else if (isMultiTheme && isCupertino)
       return CupertinoApp(
@@ -154,11 +163,6 @@ class MyApp extends StatelessWidget {
             ],
           ),
         ),
-        builder: (context, child) {
-          CustomTheme.of(context).setMediaContext(context);
-          // print(CupertinoTheme.of(context).primaryColor.hashCode);
-          return child;
-        },
       );
     else if (isCupertino)
       return TestCupertino();
@@ -184,8 +188,6 @@ class TestMaterial extends StatelessWidget {
       color: Theme.of(context).primaryColor,
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
-        // print('app build context');
-        CustomTheme.of(context).setMediaContext(context);
         CustomTheme.of(context).generateTheme(
           key: 'generated-theme',
           name: 'Generated Theme',
@@ -213,7 +215,6 @@ class TestCupertino extends StatelessWidget {
       color: Theme.of(context).primaryColor,
       home: CupertinoStoreHomePage(),
       builder: (context, child) {
-        CustomTheme.of(context).setMediaContext(context);
         CustomTheme.of(context).generateCupertinoTheme(
           key: 'generated',
           data: CustomCupertinoThemeData(
