@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 
-class CustomThemeData {
+class ThemeManagerData {
   final String key;
   final String name;
   final String createdBy;
   final ThemeData themeData;
-
-  /// Don't access [customData] from [CustomThemeData] directly. instead use
-  /// ```
-  /// CustomTheme.customDataOf<Type>(context)
-  /// ```
-  final dynamic customData;
-  CustomThemeData({
+  ThemeManagerData({
     this.key,
     this.name,
     this.createdBy,
-    @required this.themeData,
-    this.customData,
+    this.themeData,
   });
 }

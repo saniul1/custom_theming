@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:custom_theming/custom_theme.dart';
+import 'package:theme_manager/theme_manager.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,13 +7,14 @@ import 'package:flutter/widgets.dart';
 
 void main() {
   runApp(
-    CustomTheme(
+    ThemeManager(
       defaultLightTheme: 'default-light',
       defaultDarkTheme: 'default-dark',
       defaultCupertinoTheme: 'default',
       themeMode: ThemeMode.system,
       themes: MyThemes.themes,
       cupertinoThemes: MyThemes.cupertinoThemes,
+      customData: MyThemes.customData,
       keepOnDisableFollow: false,
       child: MyApp(),
     ),
@@ -28,26 +29,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
-    //   CustomTheme.of(context).resetSettings();
+    //   ThemeManager.of(context).resetSettings();
     // });
-    CustomTheme.of(context).generateTheme(
-      themeKey: 'null',
-      name: 'null',
-      createdBy: 'null',
-      data: null,
-      customData: Name(name: 'Custom Theming'),
-    );
     if (noAppWidget)
       return Container(
-        color: CustomTheme.themeOf(context).themeData.canvasColor,
+        color: ThemeManager.themeOf(context).themeData.canvasColor,
         child: Center(
           child: Column(children: [
             Container(
-              color: CustomTheme.themeOf(context).themeData.primaryColor,
+              color: ThemeManager.themeOf(context).themeData.primaryColor,
               height: 100,
               child: Center(
                 child: RaisedButton(
-                  onPressed: CustomTheme.of(context).toggleDarkMode,
+                  onPressed: ThemeManager.of(context).toggleDarkMode,
                   child: Text(
                     'Toggle',
                     textDirection: TextDirection.ltr,
@@ -55,18 +49,18 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
-            ...CustomTheme.of(context).themes.keys.map((themeKey) {
+            ...ThemeManager.of(context).themes.keys.map((themeKey) {
               return RaisedButton(
-                color: CustomTheme.of(context)
+                color: ThemeManager.of(context)
                     .themes[themeKey]
                     .themeData
                     .primaryColor,
-                onPressed: () => CustomTheme.of(context)
+                onPressed: () => ThemeManager.of(context)
                     .setTheme(themeKey, apply: true, both: false),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (CustomTheme.of(context).checkIfDefault(themeKey))
+                    if (ThemeManager.of(context).checkIfDefault(themeKey))
                       Icon(
                         Icons.star,
                         size: 14,
@@ -75,11 +69,11 @@ class MyApp extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        CustomTheme.of(context).themes[themeKey].name,
+                        ThemeManager.of(context).themes[themeKey].name,
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    if (CustomTheme.of(context).checkIfCurrent(themeKey))
+                    if (ThemeManager.of(context).checkIfCurrent(themeKey))
                       Icon(
                         Icons.done_outline,
                         size: 14,
@@ -92,13 +86,13 @@ class MyApp extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                CustomTheme.customDataOf<Name>(context)?.name ?? 'Nothing!',
+                ThemeManager.customDataOf<Name>(context)?.name ?? 'Nothing!',
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                CustomTheme.customDataOf<Name>(context)?.no?.toString() ??
+                ThemeManager.customDataOf<Name>(context)?.no?.toString() ??
                     'Nothing!!',
               ),
             )
@@ -110,10 +104,10 @@ class MyApp extends StatelessWidget {
         title: 'Theming',
         builder: (context, int) {
           return Container(
-            color: CustomTheme.themeOf(context).themeData.canvasColor,
+            color: ThemeManager.themeOf(context).themeData.canvasColor,
             child: Center(
               child: RaisedButton(
-                onPressed: CustomTheme.of(context).toggleDarkMode,
+                onPressed: ThemeManager.of(context).toggleDarkMode,
                 child: Text(
                   'Hello, world!',
                   textDirection: TextDirection.ltr,
@@ -123,35 +117,36 @@ class MyApp extends StatelessWidget {
           );
         },
         color: Colors.red,
-        // color: CustomTheme.themeOf(context).themeData.primaryColor,
+        // color: ThemeManager.themeOf(context).themeData.primaryColor,
       );
 
     if (isMultiTheme && !isCupertino)
       return MaterialApp(
-        theme: CustomTheme.of(context).lightTheme,
-        darkTheme: CustomTheme.of(context).darkTheme,
-        themeMode: CustomTheme.of(context).themeMode,
+        theme: ThemeManager.of(context).lightTheme,
+        darkTheme: ThemeManager.of(context).darkTheme,
+        themeMode: ThemeManager.of(context).themeMode,
         home: Scaffold(
           appBar: AppBar(
             title: Text(
-                "${CustomTheme.of(context).currentThemeKey} / ${CustomTheme.of(context).themes.length}" ??
+                "${ThemeManager.of(context).currentThemeKey} / ${ThemeManager.of(context).themes.length}" ??
                     ''),
             leading: IconButton(
               icon: Icon(Icons.refresh),
-              onPressed: () => CustomTheme.of(context).setTheme(
-                CustomTheme.of(context).themes.keys.toList()[Random().nextInt(
-                  CustomTheme.of(context).themes.keys.toList().length,
+              onPressed: () => ThemeManager.of(context).setTheme(
+                ThemeManager.of(context).themes.keys.toList()[Random().nextInt(
+                  ThemeManager.of(context).themes.keys.toList().length,
                 )],
                 apply: true,
               ),
             ),
           ),
-          body: CustomTheme(
+          body: ThemeManager(
             prefix: '2nd',
             defaultLightTheme: 'default-light',
             defaultDarkTheme: 'default-dark',
-            themeMode: ThemeMode.dark,
+            themeMode: ThemeMode.light,
             themes: MyThemes.themes,
+            customData: MyThemes.customData,
             keepOnDisableFollow: false,
             child: TestMaterial(),
           ),
@@ -164,15 +159,16 @@ class MyApp extends StatelessWidget {
         //   // DefaultWidgetsLocalizations.delegate,
         //   // DefaultCupertinoLocalizations.delegate,
         // ],
-        theme: CustomTheme.of(context).cupertinoTheme,
+        theme: ThemeManager.of(context).cupertinoTheme,
 
         home: CupertinoPageScaffold(
           child: Stack(
             children: [
-              CustomTheme(
+              ThemeManager(
                 prefix: '2nd',
                 defaultCupertinoTheme: 'default',
                 cupertinoThemes: MyThemes.cupertinoThemes,
+                customData: MyThemes.customData,
                 keepOnDisableFollow: false,
                 child: TestCupertino(),
               ),
@@ -182,7 +178,7 @@ class MyApp extends StatelessWidget {
                   height: 130,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16.0),
-                    color: CustomTheme.cupertinoThemeOf(context)
+                    color: ThemeManager.cupertinoThemeOf(context)
                         .themeData
                         .primaryColor,
                   ),
@@ -191,23 +187,23 @@ class MyApp extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "${CustomTheme.customCupertinoDataOf<Name>(context)?.no ?? -1}/${CustomTheme.of(context).cupertinoThemes.length.toString()}",
+                          "${ThemeManager.customDataOf<Name>(context, true)?.no ?? -1}/${ThemeManager.of(context).cupertinoThemes.length.toString()}",
                         ),
                       ),
                       CupertinoButton(
                         child: Icon(
                           Icons.refresh,
-                          color: CustomTheme.cupertinoThemeOf(context)
+                          color: ThemeManager.cupertinoThemeOf(context)
                               .themeData
                               .primaryContrastingColor,
                         ),
                         onPressed: () =>
-                            CustomTheme.of(context).setCupertinoTheme(
-                          CustomTheme.of(context)
+                            ThemeManager.of(context).setCupertinoTheme(
+                          ThemeManager.of(context)
                               .cupertinoThemes
                               .keys
                               .toList()[Random().nextInt(
-                            CustomTheme.of(context)
+                            ThemeManager.of(context)
                                 .cupertinoThemes
                                 .keys
                                 .toList()
@@ -218,9 +214,9 @@ class MyApp extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          CustomTheme.of(context).currentCupertinoThemeKey,
+                          ThemeManager.of(context).currentCupertinoThemeKey,
                           style: TextStyle(
-                            color: CustomTheme.cupertinoThemeOf(context)
+                            color: ThemeManager.cupertinoThemeOf(context)
                                 .themeData
                                 .primaryContrastingColor,
                           ),
@@ -250,15 +246,15 @@ class TestMaterial extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: CustomTheme.of(context).lightTheme,
-      darkTheme: CustomTheme.of(context).darkTheme,
-      themeMode: CustomTheme.of(context).themeMode,
+      theme: ThemeManager.of(context).lightTheme,
+      darkTheme: ThemeManager.of(context).darkTheme,
+      themeMode: ThemeManager.of(context).themeMode,
       initialRoute: "/",
       title: 'Theming',
       color: Theme.of(context).primaryColor,
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
-        CustomTheme.of(context).generateTheme(
+        ThemeManager.of(context).generateTheme(
           themeKey: 'generated-theme',
           name: 'Generated Theme',
           createdBy: '',
@@ -279,24 +275,28 @@ class TestCupertino extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoApp(
       debugShowCheckedModeBanner: false,
-      theme: CustomTheme.of(context).cupertinoTheme,
+      theme: ThemeManager.of(context).cupertinoTheme,
       initialRoute: "/",
       title: 'Theming',
       color: Theme.of(context).primaryColor,
       home: CupertinoStoreHomePage(),
       builder: (context, child) {
-        CustomTheme.of(context).generateCupertinoTheme(
+        ThemeManager.of(context).generateCupertinoTheme(
           themeKey: 'generated',
           name: 'Generated on Build',
           createdBy: 'Dev',
           data: CupertinoThemeData().copyWith(
             primaryColor: Colors.purple,
           ),
-          customData: Name(name: 'created By Dev', no: 9000),
+          customData: Name(
+            name: 'Generated',
+            description: "This is a test",
+            no: 4,
+          ),
         );
-        final Name name = CustomTheme.of(context).customCupertinoData[
-            CustomTheme.of(context).currentCupertinoThemeKey];
-        print(name?.no ?? -1);
+        final Name name = ThemeManager.of(context)
+            .customData[ThemeManager.of(context).currentCupertinoThemeKey];
+        print(name?.description);
         return child;
       },
     );
@@ -307,7 +307,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Future.delayed(Duration(seconds: 1), () {
-    //   CustomTheme.of(context).resetSettings();
+    //   ThemeManager.of(context).resetSettings();
     // });
 
     return CupertinoTabScaffold(
@@ -336,7 +336,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: CustomTheme.of(context)
+                  children: ThemeManager.of(context)
                       .cupertinoThemes
                       .keys
                       .map((themeKey) {
@@ -346,15 +346,15 @@ class CupertinoStoreHomePage extends StatelessWidget {
                         vertical: 5,
                       ),
                       child: CupertinoButton(
-                        onPressed: () =>
-                            CustomTheme.of(context).setCupertinoTheme(themeKey),
+                        onPressed: () => ThemeManager.of(context)
+                            .setCupertinoTheme(themeKey),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                CustomTheme.of(context)
+                                ThemeManager.of(context)
                                     .cupertinoThemes[themeKey]
                                     .name,
                               ),
@@ -362,7 +362,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                           ],
                         ),
                         color:
-                            CustomTheme.of(context).currentCupertinoThemeKey ==
+                            ThemeManager.of(context).currentCupertinoThemeKey ==
                                     themeKey
                                 ? CupertinoTheme.of(context).primaryColor
                                 : Colors.blue,
@@ -382,15 +382,14 @@ class CupertinoStoreHomePage extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          CustomTheme.customCupertinoDataOf<Name>(context)
-                                  ?.no
-                                  ?.toString() ??
-                              'Nothing!',
+                          ThemeManager.customDataOf<Name>(context, true)
+                                  ?.name ??
+                              '',
                         ),
                         Text(
-                          CustomTheme.customCupertinoDataOf<Name>(context)
-                                  ?.name ??
-                              'Nothing!',
+                          ThemeManager.customDataOf<Name>(context, true)
+                                  ?.description ??
+                              '...',
                         ),
                       ],
                     ),
@@ -428,6 +427,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          RaisedButton(
+            onPressed: ThemeManager.of(context).resetSettings,
+            child: Text('Delete'),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -435,8 +440,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Center(
               child: Switch(
-                value: CustomTheme.of(context).checkDark(),
-                onChanged: (_) => CustomTheme.of(context).toggleDarkMode(),
+                value: ThemeManager.of(context).checkDark(),
+                onChanged: (_) => ThemeManager.of(context).toggleDarkMode(),
                 activeTrackColor: Colors.lightGreenAccent,
                 activeColor: Colors.green,
               ),
@@ -445,8 +450,8 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Checkbox(
-                  value: CustomTheme.of(context).themeMode == ThemeMode.system,
-                  onChanged: CustomTheme.of(context).setThemeModeToSystem,
+                  value: ThemeManager.of(context).themeMode == ThemeMode.system,
+                  onChanged: ThemeManager.of(context).setThemeModeToSystem,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
@@ -457,31 +462,37 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             Column(
-              children: CustomTheme.of(context).themes.keys.map((themeKey) {
-                return RaisedButton(
-                  onPressed: () => CustomTheme.of(context)
-                      .setTheme(themeKey, both: true, apply: true),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (CustomTheme.of(context).checkIfDefault(themeKey))
-                        Icon(
-                          Icons.star,
-                          size: 14,
+              children: [
+                ...ThemeManager.of(context).themes.keys.map((themeKey) {
+                  return RaisedButton(
+                    onPressed: () {
+                      ThemeManager.of(context)
+                          .setTheme(themeKey, both: true, apply: true);
+                      print(ThemeManager.customDataOf<Name>(context)
+                          ?.description);
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (ThemeManager.of(context).checkIfDefault(themeKey))
+                          Icon(
+                            Icons.star,
+                            size: 14,
+                          ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            ThemeManager.of(context).themes[themeKey].name,
+                          ),
                         ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          CustomTheme.of(context).themes[themeKey].name,
-                        ),
-                      ),
-                    ],
-                  ),
-                  color: CustomTheme.of(context).checkIfCurrent(themeKey)
-                      ? Colors.green
-                      : Colors.blue,
-                );
-              }).toList(),
+                      ],
+                    ),
+                    color: ThemeManager.of(context).checkIfCurrent(themeKey)
+                        ? Colors.green
+                        : Colors.blue,
+                  );
+                }).toList(),
+              ],
             )
           ],
         ),

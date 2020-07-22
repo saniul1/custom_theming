@@ -1,8 +1,10 @@
-name: custom_theming
-description: A new Flutter package project.
-version: 1.4.0
+name: theme_manager
+description: Flutter theme manager.
+version: 1.5.0
 author:
 homepage:
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 environment:
   sdk: '>=2.7.0 <3.0.0'
