@@ -1,11 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show ThemeData;
 
-class CustomCupertinoThemeData {
+class ThemeManagerData {
   final String key;
   final String name;
   final String createdBy;
-  final CupertinoThemeData themeData;
-  CustomCupertinoThemeData({
+  final ThemeData themeData;
+  ThemeManagerData({
     this.key,
     this.name,
     this.createdBy,

@@ -1,12 +1,15 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show ThemeData, ThemeMode, Brightness;
+import 'package:flutter/cupertino.dart' show CupertinoThemeData;
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'custom_cupertino_theme_data.dart';
-import 'custom_theme_data.dart';
+import 'cupertino_theme_data.dart';
+import 'theme_data.dart';
 
-export 'custom_theme_data.dart';
-export 'custom_cupertino_theme_data.dart';
+export 'theme_data.dart';
+export 'cupertino_theme_data.dart';
+
+enum ThemeTypes { material, cupertino }
 
 class _ThemeManager extends InheritedWidget {
   final ThemeManagerState data;
@@ -34,8 +37,21 @@ class ThemeManager extends StatefulWidget {
   final ThemeMode themeMode;
   final bool keepOnDisableFollow;
   final Color appColor;
-  final Map<String, ThemeManagerData> themes;
-  final Map<String, CustomCupertinoThemeData> cupertinoThemes;
+  final List<ThemeManagerData> themes;
+  final List<CupertinoThemeManagerData> cupertinoThemes;
+
+  /// [customData] needs to be carefully mapped to a existing theme key. like so -
+  /// ```
+  /// class Example {
+  ///   final String data;
+  ///   Example({this.data});
+  /// }
+  ///
+  /// customData: {
+  /// 'default': Example(data: 'your data'),
+  /// 'another-existing-theme-key': Example(data: 'your data'),
+  /// }
+  /// ```
   Map<String, dynamic> customData = Map();
 
   /// [ThemeManager] is best used as parent of [MaterialApp] or [CupertinoApp] or [WidgetsApp],
@@ -93,7 +109,7 @@ class ThemeManager extends StatefulWidget {
     return inherited.data.themes[inherited.data.currentThemeKey];
   }
 
-  static CustomCupertinoThemeData cupertinoThemeOf(BuildContext context) {
+  static CupertinoThemeManagerData cupertinoThemeOf(BuildContext context) {
     _ThemeManager inherited =
         (context.dependOnInheritedWidgetOfExactType<_ThemeManager>());
     return inherited
@@ -109,10 +125,11 @@ class ThemeManager extends StatefulWidget {
   /// ```
   /// ThemeManager.customDataOf<ExampleClass>(context, true)?.example
   /// ```
-  static T customDataOf<T>(BuildContext context, [bool cupertino = false]) {
+  static T customDataOf<T>(BuildContext context,
+      [ThemeTypes type = ThemeTypes.material]) {
     _ThemeManager inherited =
         (context.dependOnInheritedWidgetOfExactType<_ThemeManager>());
-    return inherited.data.customData[cupertino
+    return inherited.data.customData[type == ThemeTypes.cupertino
         ? inherited.data.currentCupertinoThemeKey
         : inherited.data.currentThemeKey] as T;
   }
@@ -125,7 +142,7 @@ class ThemeManagerState extends State<ThemeManager> {
 
   Map<String, ThemeManagerData> _themes = Map();
 
-  Map<String, CustomCupertinoThemeData> _cupertinoThemes = Map();
+  Map<String, CupertinoThemeManagerData> _cupertinoThemes = Map();
 
   Map<String, dynamic> _customData = Map();
 
@@ -139,7 +156,8 @@ class ThemeManagerState extends State<ThemeManager> {
 
   Map<String, ThemeManagerData> get themes => _themes;
 
-  Map<String, CustomCupertinoThemeData> get cupertinoThemes => _cupertinoThemes;
+  Map<String, CupertinoThemeManagerData> get cupertinoThemes =>
+      _cupertinoThemes;
 
   /// [key] could be absent in the map.
   /// always check for null before using.
@@ -197,9 +215,9 @@ class ThemeManagerState extends State<ThemeManager> {
         ),
       };
     } else {
-      widget.themes.forEach((key, value) {
-        _themes[key] = ThemeManagerData(
-          key: key,
+      widget.themes.forEach((value) {
+        _themes[value.key] = ThemeManagerData(
+          key: value.key,
           name: value.name ?? '',
           createdBy: value.createdBy ?? '',
           themeData: value.themeData ?? ThemeData(),
@@ -209,7 +227,7 @@ class ThemeManagerState extends State<ThemeManager> {
     //
     if (widget.cupertinoThemes == null) {
       _cupertinoThemes = {
-        'default': CustomCupertinoThemeData(
+        'default': CupertinoThemeManagerData(
           key: 'default',
           name: 'Default',
           createdBy: '',
@@ -217,9 +235,9 @@ class ThemeManagerState extends State<ThemeManager> {
         ),
       };
     } else {
-      widget.cupertinoThemes.forEach((key, value) {
-        _cupertinoThemes[key] = CustomCupertinoThemeData(
-          key: key,
+      widget.cupertinoThemes.forEach((value) {
+        _cupertinoThemes[value.key] = CupertinoThemeManagerData(
+          key: value.key,
           name: value.name ?? '',
           createdBy: value.createdBy ?? '',
           themeData: value.themeData ?? CupertinoThemeData(),
@@ -261,7 +279,7 @@ class ThemeManagerState extends State<ThemeManager> {
           child: widget.child,
         );
       },
-      color: widget.appColor ?? Colors.blue,
+      color: widget.appColor ?? Color(0xFF2196F3),
     );
   }
 
@@ -305,7 +323,6 @@ class ThemeManagerState extends State<ThemeManager> {
 
   /// set default theme for [cupertinoTheme]
   void setCupertinoTheme(String themeKey) {
-    // print(themeKey);
     setState(() {
       _currentCupertinoThemeKey = themeKey;
     });
@@ -399,20 +416,12 @@ class ThemeManagerState extends State<ThemeManager> {
   /// },
   /// ```
   void generateTheme({
-    @required String themeKey,
-    @required String name,
-    @required String createdBy,
-    @required ThemeData data,
+    @required ThemeManagerData themeData,
     dynamic customData,
   }) {
-    assert(themeKey != null, "[themeKay] can't be null");
-    _themes[themeKey] = ThemeManagerData(
-      key: themeKey,
-      name: name ?? '',
-      createdBy: createdBy ?? '',
-      themeData: data ?? ThemeData(),
-    );
-    if (customData != null) _customData[themeKey] = customData;
+    assert(themeData != null, "[themeData] can't be null");
+    _themes[themeData.key] = themeData;
+    _customData[themeData.key] = customData;
   }
 
   /// Make sure [ThemeManager] exist in the widget tree, above of the widget where you are trying to add new themes.
@@ -427,20 +436,12 @@ class ThemeManagerState extends State<ThemeManager> {
   /// },
   /// ```
   void generateCupertinoTheme({
-    @required String themeKey,
-    @required String name,
-    @required String createdBy,
-    @required CupertinoThemeData data,
+    @required CupertinoThemeManagerData themeData,
     dynamic customData,
   }) {
-    assert(themeKey != null, "[themeKay] can't be null");
-    _cupertinoThemes[themeKey] = CustomCupertinoThemeData(
-      key: themeKey,
-      name: name ?? '',
-      createdBy: createdBy ?? '',
-      themeData: data ?? CupertinoThemeData(),
-    );
-    if (themeKey != null) _customData[themeKey] = customData;
+    assert(themeData != null, "[themeData] can't be null");
+    _cupertinoThemes[themeData.key] = themeData;
+    _customData[themeData.key] = customData;
   }
 
   /// reset every settings, Go back to hard coded settings.
@@ -452,6 +453,5 @@ class ThemeManagerState extends State<ThemeManager> {
     await _sharedPrefs?.remove('${widget.prefix}-default-cupertino');
     setDefaults();
     setState(() {});
-    print('All Deleted');
   }
 }

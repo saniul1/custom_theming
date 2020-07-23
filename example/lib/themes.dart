@@ -10,46 +10,79 @@ class Name {
 }
 
 class MyThemes {
-  static final Map<String, ThemeManagerData> themes = {
-    'default-dark': ThemeManagerData(
+  static final List<ThemeManagerData> themes = [
+    ThemeManagerData(
+      key: 'default-dark',
       name: 'Default Dark',
       createdBy: '',
       themeData: ThemeData.dark(),
     ),
-    'default-light': ThemeManagerData(
+    ThemeManagerData(
+      key: 'default-light',
       name: 'Default Light',
       createdBy: '',
       themeData: ThemeData(),
     ),
-    'default-light2': ThemeManagerData(
+    ThemeManagerData(
+      key: 'default-light2',
       name: 'Default Light 2',
       createdBy: '',
       themeData: ThemeData().copyWith(
         primaryColor: Colors.teal,
       ),
     ),
-    'darker-dark': ThemeManagerData(
+    ThemeManagerData(
+      key: 'darker-dark',
       name: 'Darker Dark',
       createdBy: '',
       themeData: ThemeData.dark().copyWith(
         primaryColor: Colors.black,
       ),
     ),
-    'test*dark': ThemeManagerData(
+    ThemeManagerData(
+      key: 'test*dark',
       name: 'Test Dark',
       createdBy: '',
       themeData: ThemeData.dark().copyWith(
         primaryColor: Colors.grey,
       ),
     ),
-    'test*light': ThemeManagerData(
+    ThemeManagerData(
+      key: 'test*light',
       name: 'Test Light',
       createdBy: '',
       themeData: ThemeData.light().copyWith(
         primaryColor: Colors.pink,
       ),
     ),
-  };
+  ];
+  static final List<CupertinoThemeManagerData> cupertinoThemes = [
+    CupertinoThemeManagerData(
+      key: 'default',
+      name: 'Default',
+      createdBy: 'Dev',
+      themeData: CupertinoThemeData().copyWith(
+        primaryColor: Colors.amber,
+      ),
+    ),
+    CupertinoThemeManagerData(
+      key: 'green',
+      name: 'Green',
+      createdBy: 'Dev',
+      themeData: CupertinoThemeData().copyWith(
+        primaryColor: Colors.green,
+      ),
+    ),
+    CupertinoThemeManagerData(
+      key: 'red',
+      name: 'Red',
+      createdBy: 'Dev',
+      themeData: CupertinoThemeData().copyWith(
+        primaryColor: Colors.red,
+      ),
+      // customData: Name(no: 3),
+    ),
+  ];
   static final Map<String, Name> customData = {
     'default': Name(
       name: 'Default',
@@ -75,30 +108,6 @@ class MyThemes {
       name: 'Default Dark',
       description: 'This is default dark theme for material',
       no: 02,
-    ),
-  };
-  static final Map<String, CustomCupertinoThemeData> cupertinoThemes = {
-    'default': CustomCupertinoThemeData(
-      name: 'Default',
-      createdBy: 'Dev',
-      themeData: CupertinoThemeData().copyWith(
-        primaryColor: Colors.amber,
-      ),
-    ),
-    'green': CustomCupertinoThemeData(
-      name: 'Green',
-      createdBy: 'Dev',
-      themeData: CupertinoThemeData().copyWith(
-        primaryColor: Colors.green,
-      ),
-    ),
-    'red': CustomCupertinoThemeData(
-      name: 'Red',
-      createdBy: 'Dev',
-      themeData: CupertinoThemeData().copyWith(
-        primaryColor: Colors.red,
-      ),
-      // customData: Name(no: 3),
     ),
   };
 }

@@ -187,7 +187,7 @@ class MyApp extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "${ThemeManager.customDataOf<Name>(context, true)?.no ?? -1}/${ThemeManager.of(context).cupertinoThemes.length.toString()}",
+                          "${ThemeManager.customDataOf<Name>(context, ThemeTypes.cupertino)?.no ?? -1}/${ThemeManager.of(context).cupertinoThemes.length.toString()}",
                         ),
                       ),
                       CupertinoButton(
@@ -255,10 +255,12 @@ class TestMaterial extends StatelessWidget {
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
         ThemeManager.of(context).generateTheme(
-          themeKey: 'generated-theme',
-          name: 'Generated Theme',
-          createdBy: '',
-          data: ThemeData.dark().copyWith(),
+          themeData: ThemeManagerData(
+            key: 'generated-theme',
+            name: 'Generated Theme',
+            createdBy: '',
+            themeData: ThemeData.dark().copyWith(),
+          ),
         );
         return child;
       },
@@ -282,11 +284,13 @@ class TestCupertino extends StatelessWidget {
       home: CupertinoStoreHomePage(),
       builder: (context, child) {
         ThemeManager.of(context).generateCupertinoTheme(
-          themeKey: 'generated',
-          name: 'Generated on Build',
-          createdBy: 'Dev',
-          data: CupertinoThemeData().copyWith(
-            primaryColor: Colors.purple,
+          themeData: CupertinoThemeManagerData(
+            key: 'generated',
+            name: 'Generated on Build',
+            createdBy: 'Dev',
+            themeData: CupertinoThemeData().copyWith(
+              primaryColor: Colors.purple,
+            ),
           ),
           customData: Name(
             name: 'Generated',
@@ -382,12 +386,14 @@ class CupertinoStoreHomePage extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          ThemeManager.customDataOf<Name>(context, true)
+                          ThemeManager.customDataOf<Name>(
+                                      context, ThemeTypes.cupertino)
                                   ?.name ??
                               '',
                         ),
                         Text(
-                          ThemeManager.customDataOf<Name>(context, true)
+                          ThemeManager.customDataOf<Name>(
+                                      context, ThemeTypes.cupertino)
                                   ?.description ??
                               '...',
                         ),
