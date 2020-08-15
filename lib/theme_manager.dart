@@ -272,7 +272,7 @@ class ThemeManagerState extends State<ThemeManager> {
   Widget build(BuildContext context) {
     return WidgetsApp(
       debugShowCheckedModeBanner: false,
-      builder: (context, int) {
+      builder: (context, _) {
         _mediaContext = context;
         return _ThemeManager(
           data: this,
