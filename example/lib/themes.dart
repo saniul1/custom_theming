@@ -2,12 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:theme_manager/theme_manager.dart';
 
-class Name {
-  final String name;
-  final String description;
-  final int no;
-  Name({this.name, this.description, this.no});
-}
+import 'models.dart';
 
 class MyThemes {
   static final List<ThemeManagerData> themes = [
@@ -83,31 +78,46 @@ class MyThemes {
       // customData: Name(no: 3),
     ),
   ];
-  static final Map<String, Name> customData = {
-    'default': Name(
-      name: 'Default',
-      description: 'This is default cupertino theme',
-      no: 1,
+  static final List<CustomThemeManagerData> customData = [
+    CustomThemeManagerData(
+      key: 'default',
+      data: Name(
+        name: 'Default',
+        description: 'This is default cupertino theme',
+        no: 1,
+      ),
     ),
-    'green': Name(
-      name: 'Green',
-      description: 'This is green cupertino theme',
-      no: 2,
+    CustomThemeManagerData(
+      key: 'green',
+      data: Name(
+        name: 'Green',
+        description: 'This is green cupertino theme...',
+        no: 2,
+      ),
     ),
-    'red': Name(
-      name: 'Red',
-      description: 'This is red cupertino theme',
-      no: 3,
+    CustomThemeManagerData(
+      key: 'red',
+      data: Name(
+        name: 'Red',
+        description: 'This is red cupertino theme!',
+        no: 3,
+      ),
     ),
-    'default-light': Name(
-      name: 'Default Light',
-      description: 'This is default light theme for material',
-      no: 01,
+    CustomThemeManagerData(
+      key: 'default-light',
+      data: Name(
+        name: 'Default Light',
+        description: 'This is default "light" theme for material',
+        no: 01,
+      ),
     ),
-    'default-dark': Name(
-      name: 'Default Dark',
-      description: 'This is default dark theme for material',
-      no: 02,
+    CustomThemeManagerData(
+      key: 'default-dark',
+      data: Name(
+        name: 'Default Dark',
+        description: 'This is default "dark" theme for material',
+        no: 02,
+      ),
     ),
-  };
+  ];
 }
