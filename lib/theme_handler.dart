@@ -197,13 +197,13 @@ class ThemeManagerState extends State<ThemeManager> {
         'default-light': ThemeManagerData(
           key: 'default-light',
           name: 'Default Light',
-          createdBy: '',
+          creator: '',
           themeData: ThemeData.light(),
         ),
         'default-dark': ThemeManagerData(
           key: 'default-dark',
           name: 'Default Dark',
-          createdBy: '',
+          creator: '',
           themeData: ThemeData.dark(),
         ),
       };
@@ -212,7 +212,7 @@ class ThemeManagerState extends State<ThemeManager> {
         _themes[value.key] = ThemeManagerData(
           key: value.key,
           name: value.name ?? '',
-          createdBy: value.createdBy ?? '',
+          creator: value.creator ?? '',
           themeData: value.themeData ?? ThemeData(),
         );
       });
@@ -223,7 +223,7 @@ class ThemeManagerState extends State<ThemeManager> {
         'default': CupertinoThemeManagerData(
           key: 'default',
           name: 'Default',
-          createdBy: '',
+          creator: '',
           themeData: CupertinoThemeData(),
         ),
       };
@@ -232,7 +232,7 @@ class ThemeManagerState extends State<ThemeManager> {
         _cupertinoThemes[value.key] = CupertinoThemeManagerData(
           key: value.key,
           name: value.name ?? '',
-          createdBy: value.createdBy ?? '',
+          creator: value.creator ?? '',
           themeData: value.themeData ?? CupertinoThemeData(),
         );
       });

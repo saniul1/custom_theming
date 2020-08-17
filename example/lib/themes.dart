@@ -9,19 +9,19 @@ class MyThemes {
     ThemeManagerData(
       key: 'default-dark',
       name: 'Default Dark',
-      createdBy: '',
+      creator: '',
       themeData: ThemeData.dark(),
     ),
     ThemeManagerData(
       key: 'default-light',
       name: 'Default Light',
-      createdBy: '',
+      creator: '',
       themeData: ThemeData(),
     ),
     ThemeManagerData(
       key: 'default-light2',
       name: 'Default Light 2',
-      createdBy: '',
+      creator: '',
       themeData: ThemeData().copyWith(
         primaryColor: Colors.teal,
       ),
@@ -29,7 +29,7 @@ class MyThemes {
     ThemeManagerData(
       key: 'darker-dark',
       name: 'Darker Dark',
-      createdBy: '',
+      creator: '',
       themeData: ThemeData.dark().copyWith(
         primaryColor: Colors.black,
       ),
@@ -37,7 +37,7 @@ class MyThemes {
     ThemeManagerData(
       key: 'test*dark',
       name: 'Test Dark',
-      createdBy: '',
+      creator: '',
       themeData: ThemeData.dark().copyWith(
         primaryColor: Colors.grey,
       ),
@@ -45,7 +45,7 @@ class MyThemes {
     ThemeManagerData(
       key: 'test*light',
       name: 'Test Light',
-      createdBy: '',
+      creator: '',
       themeData: ThemeData.light().copyWith(
         primaryColor: Colors.pink,
       ),
@@ -55,7 +55,7 @@ class MyThemes {
     CupertinoThemeManagerData(
       key: 'default',
       name: 'Default',
-      createdBy: 'Dev',
+      creator: 'Dev',
       themeData: CupertinoThemeData().copyWith(
         primaryColor: Colors.amber,
       ),
@@ -63,7 +63,7 @@ class MyThemes {
     CupertinoThemeManagerData(
       key: 'green',
       name: 'Green',
-      createdBy: 'Dev',
+      creator: 'Dev',
       themeData: CupertinoThemeData().copyWith(
         primaryColor: Colors.green,
       ),
@@ -71,7 +71,7 @@ class MyThemes {
     CupertinoThemeManagerData(
       key: 'red',
       name: 'Red',
-      createdBy: 'Dev',
+      creator: 'Dev',
       themeData: CupertinoThemeData().copyWith(
         primaryColor: Colors.red,
       ),

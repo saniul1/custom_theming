@@ -227,7 +227,7 @@ class TestMaterialApp extends StatelessWidget {
           ThemeManagerData(
             key: 'generated-theme',
             name: 'Generated Theme',
-            createdBy: '',
+            creator: '',
             themeData: ThemeData.dark().copyWith(),
           ),
         );
@@ -343,7 +343,7 @@ class TestCupertinoApp extends StatelessWidget {
           CupertinoThemeManagerData(
             key: 'generated',
             name: 'Generated on Build',
-            createdBy: 'Dev',
+            creator: 'Dev',
             themeData: CupertinoThemeData().copyWith(
               primaryColor: Colors.purple,
             ),
