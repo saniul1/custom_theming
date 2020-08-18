@@ -83,13 +83,13 @@ class CupertinoStoreHomePage extends StatelessWidget {
                       children: [
                         Text(
                           ThemeManager.customDataOf<Name>(
-                                      context, ThemeTypes.cupertino)
+                                      context, ThemeType.cupertino)
                                   ?.name ??
                               '',
                         ),
                         Text(
                           ThemeManager.customDataOf<Name>(
-                                      context, ThemeTypes.cupertino)
+                                      context, ThemeType.cupertino)
                                   ?.description ??
                               '...',
                         ),

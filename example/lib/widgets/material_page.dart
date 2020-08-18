@@ -59,7 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: () {
                       ThemeManager.of(context)
                           .setTheme(themeKey, both: true, apply: true);
-                      print(ThemeManager.customDataOf<Name>(context)
+                      print(ThemeManager.customDataOf<Name>(
+                              context, ThemeType.material)
                           ?.description);
                     },
                     child: Row(
