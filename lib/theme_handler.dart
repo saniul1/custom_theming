@@ -467,7 +467,8 @@ class ThemeManagerState extends State<ThemeManager> {
     _cupertinoThemes[themeData.key] = themeData;
   }
 
-  /// Add additional [customData] later inn the app
+  /// Add additional [customData] later in the app
+  /// always make sure [ThemeManager] exist above your builder function
   void addToCustomData(
     CustomThemeManagerData data,
   ) {
@@ -501,6 +502,7 @@ class ThemeManagerState extends State<ThemeManager> {
     await _sharedPrefs?.remove('${widget.prefix}-default-light');
     await _sharedPrefs?.remove('${widget.prefix}-default-dark');
     await _sharedPrefs?.remove('${widget.prefix}-default-cupertino');
+    await _sharedPrefs?.remove('${widget.prefix}-default-custom-data');
     _setDefaults();
     setState(() {});
   }
