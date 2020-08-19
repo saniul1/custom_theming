@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ],
                     ),
                     color: ThemeManager.of(context).checkIfCurrent(themeKey)
-                        ? Colors.green
+                        ? ThemeManager.themeOf(context).themeData.primaryColor
                         : Colors.blue,
                   );
                 }).toList(),

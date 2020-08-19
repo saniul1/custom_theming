@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:example/util.dart/restart_app.dart';
 import 'package:theme_manager/theme_manager.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart' hide Radio;
@@ -8,22 +9,25 @@ import 'package:flutter/widgets.dart';
 import 'models.dart';
 import 'widgets/check_box.dart';
 import 'widgets/cupertino_page.dart';
+import 'widgets/delete_dialogue.dart';
 import 'widgets/material_page.dart';
 import 'widgets/radio.dart';
 import 'widgets/theme_selector.dart';
 
 void main() {
   runApp(
-    ThemeManager(
-      defaultLightTheme: 'default-light',
-      defaultDarkTheme: 'default-dark',
-      defaultCupertinoTheme: 'default',
-      themeMode: ThemeMode.system,
-      themes: MyThemes.themes,
-      cupertinoThemes: MyThemes.cupertinoThemes,
-      customData: MyThemes.customData,
-      keepOnDisableFollow: false,
-      child: MyApp(),
+    ReloadChildWidget(
+      child: ThemeManager(
+        defaultLightTheme: 'default-light',
+        defaultDarkTheme: 'default-dark',
+        defaultCupertinoTheme: 'default',
+        themeMode: ThemeMode.system,
+        themes: MyThemes.themes,
+        cupertinoThemes: MyThemes.cupertinoThemes,
+        customData: MyThemes.customData,
+        keepOnDisableFollow: false,
+        child: MyApp(),
+      ),
     ),
   );
 }
@@ -34,18 +38,18 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  Key key = UniqueKey();
+
   bool isCupertino = false;
   bool onlyWidgetApp = false;
   bool noAppWidget = false;
   bool isMultiTheme = false;
 
   bool _showMore = false;
+  bool _warnDelete = false;
 
   @override
   Widget build(BuildContext context) {
-    // Future.delayed(Duration(seconds: 1), () {
-    //   ThemeManager.of(context).resetSettings();
-    // });
     return Stack(
       children: [
         if (noAppWidget && onlyWidgetApp) NoAppWidget(),
@@ -76,127 +80,168 @@ class _MyAppState extends State<MyApp> {
             child: ThemeManager(
               customData: ThemeSelectorThemes.themeData,
               child: Builder(builder: (context) {
-                return Container(
-                  constraints: BoxConstraints(
-                    maxHeight: 300,
-                    maxWidth: 300,
-                  ),
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 50),
-                    margin: const EdgeInsets.all(8.0),
-                    width: _showMore ? null : 40,
-                    height: _showMore ? null : 40,
-                    decoration: BoxDecoration(
-                      color: ThemeManager.customDataOf<ThemeSelectorThemes>(
-                                  context)
-                              ?.color ??
-                          Colors.amber,
-                      shape: _showMore ? BoxShape.rectangle : BoxShape.circle,
-                    ),
-                    child: _showMore
-                        ? Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    CheckBox(
-                                      active: isMultiTheme,
-                                      label: 'Multiple Apps',
-                                      onTap: () {
-                                        setState(() {
-                                          isMultiTheme = !isMultiTheme;
-                                        });
-                                      },
-                                    ),
-                                    CheckBox(
-                                      active: noAppWidget,
-                                      label: 'No Parent App',
-                                      onTap: () {
-                                        setState(() {
-                                          noAppWidget = !noAppWidget;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Radio(
-                                      active: !isCupertino && !onlyWidgetApp,
-                                      label: 'Show Material App',
-                                      onTap: () {
-                                        setState(() {
-                                          isCupertino = false;
-                                          onlyWidgetApp = false;
-                                        });
-                                      },
-                                    ),
-                                    Radio(
-                                      active: isCupertino && !onlyWidgetApp,
-                                      label: 'Show Cupertino App',
-                                      onTap: () {
-                                        setState(() {
-                                          isCupertino = true;
-                                          onlyWidgetApp = false;
-                                        });
-                                      },
-                                    ),
-                                    Radio(
-                                      active: onlyWidgetApp,
-                                      label: 'Show Widgets App Only',
-                                      onTap: () {
-                                        setState(() {
-                                          onlyWidgetApp = true;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                Stack(
-                                  children: [
-                                    Row(
-                                      children: ThemeManager.of(context)
-                                          .customDataMap
-                                          .entries
-                                          .map((entries) {
-                                        final data = entries.value.data
-                                            as ThemeSelectorThemes;
-                                        return ThemeSelector(
-                                          color: data.color,
-                                          themeKey: entries.key,
-                                          active: entries.key ==
-                                              ThemeManager.of(context)
-                                                  .currentCustomDataKey,
-                                        );
-                                      }).toList(),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.blue,
-                                        ),
-                                        child: Icon(
-                                          Icons.delete,
-                                          color: Colors.white,
-                                        ),
+                return Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxHeight: 300,
+                          maxWidth: 300,
+                        ),
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 50),
+                          margin: const EdgeInsets.all(8.0),
+                          width: _showMore ? null : 40,
+                          height: _showMore ? null : 40,
+                          decoration: BoxDecoration(
+                            color:
+                                ThemeManager.customDataOf<ThemeSelectorThemes>(
+                                            context)
+                                        ?.color ??
+                                    Colors.amber,
+                            shape: _showMore
+                                ? BoxShape.rectangle
+                                : BoxShape.circle,
+                          ),
+                          child: _showMore
+                              ? Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          CheckBox(
+                                            active: isMultiTheme,
+                                            label: 'Multiple Apps',
+                                            onTap: () {
+                                              setState(() {
+                                                isMultiTheme = !isMultiTheme;
+                                              });
+                                            },
+                                          ),
+                                          CheckBox(
+                                            active: noAppWidget,
+                                            label: 'No Parent App',
+                                            onTap: () {
+                                              setState(() {
+                                                noAppWidget = !noAppWidget;
+                                              });
+                                            },
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        : Icon(Icons.more_horiz),
-                  ),
+                                      Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Radio(
+                                            active:
+                                                !isCupertino && !onlyWidgetApp,
+                                            label: 'Show Material App',
+                                            onTap: () {
+                                              setState(() {
+                                                isCupertino = false;
+                                                onlyWidgetApp = false;
+                                              });
+                                            },
+                                          ),
+                                          Radio(
+                                            active:
+                                                isCupertino && !onlyWidgetApp,
+                                            label: 'Show Cupertino App',
+                                            onTap: () {
+                                              setState(() {
+                                                isCupertino = true;
+                                                onlyWidgetApp = false;
+                                              });
+                                            },
+                                          ),
+                                          Radio(
+                                            active: onlyWidgetApp,
+                                            label: 'Show Widgets App Only',
+                                            onTap: () {
+                                              setState(() {
+                                                onlyWidgetApp = true;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      Stack(
+                                        children: [
+                                          Row(
+                                            children: ThemeManager.of(context)
+                                                .customDataMap
+                                                .entries
+                                                .map((entries) {
+                                              final data = entries.value.data
+                                                  as ThemeSelectorThemes;
+                                              return ThemeSelector(
+                                                color: data.color,
+                                                themeKey: entries.key,
+                                                active: entries.key ==
+                                                    ThemeManager.of(context)
+                                                        .currentCustomDataKey,
+                                              );
+                                            }).toList(),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.blue,
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    _warnDelete = true;
+                                                    _showMore = false;
+                                                  });
+                                                },
+                                                child: Icon(
+                                                  Icons.delete,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Icon(Icons.more_horiz),
+                        ),
+                      ),
+                    ),
+                    if (_warnDelete)
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _warnDelete = false;
+                          });
+                        },
+                        child: Container(
+                          color: Colors.black12,
+                        ),
+                      ),
+                    if (_warnDelete)
+                      DeleteSettingDialogue(
+                        onCancel: () {
+                          setState(() {
+                            _warnDelete = false;
+                          });
+                        },
+                      ),
+                  ],
                 );
               }),
             ),
@@ -234,7 +279,7 @@ class MultiMaterialApp extends StatelessWidget {
           ),
         ),
         body: ThemeManager(
-          prefix: '2nd',
+          id: '2nd',
           defaultLightTheme: 'default-light',
           defaultDarkTheme: 'default-dark',
           themeMode: ThemeMode.light,
@@ -292,7 +337,7 @@ class MultiCupertinoApp extends StatelessWidget {
         child: Stack(
           children: [
             ThemeManager(
-              prefix: '2nd',
+              id: '2nd',
               defaultCupertinoTheme: 'default',
               cupertinoThemes: MyThemes.cupertinoThemes,
               customData: MyThemes.customData,
@@ -495,13 +540,17 @@ class NoAppWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              ThemeManager.customDataOf<Name>(context)?.name ?? 'Nothing!',
+              ThemeManager.customDataOf<Name>(context, ThemeType.material)
+                      ?.name ??
+                  'Nothing!',
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              ThemeManager.customDataOf<Name>(context)?.no?.toString() ??
+              ThemeManager.customDataOf<Name>(context, ThemeType.material)
+                      ?.no
+                      ?.toString() ??
                   'Nothing!!',
             ),
           )

@@ -26,7 +26,7 @@ class _ThemeManager extends InheritedWidget {
 
 class ThemeManager extends StatefulWidget {
   final Widget child;
-  final String prefix;
+  final String id;
   final String defaultLightTheme;
   final String defaultDarkTheme;
   final String defaultCupertinoTheme;
@@ -56,7 +56,7 @@ class ThemeManager extends StatefulWidget {
   /// [ThemeManager] is best used as parent of [MaterialApp] or [CupertinoApp] or [WidgetsApp],
   /// but you can also use it without any of these widget.
   ///
-  /// Add [prefix] to separate data on different part in the app.
+  /// Add [id] to separate data on different part in the app.
   ///
   /// pass [themes] using a map [Map<String, ThemeManagerData>] and use key of [map] as [themeKey]
   ///
@@ -67,7 +67,7 @@ class ThemeManager extends StatefulWidget {
   /// [cupertinoThemes] does not support [themeMode]. it always follow system setting.
   ThemeManager({
     Key key,
-    this.prefix = 'app',
+    this.id = 'app',
     this.keepOnDisableFollow = false,
     this.themeMode = ThemeMode.system,
     this.defaultLightTheme,
@@ -261,15 +261,14 @@ class ThemeManagerState extends State<ThemeManager> {
     // get value from system machine and change defaults.
     SharedPreferences.getInstance().then((prefs) {
       _sharedPrefs = prefs;
-      final isDark = _sharedPrefs?.getBool('${widget.prefix}-dark-mode');
-      final followSystem =
-          _sharedPrefs?.getBool('${widget.prefix}-follow-system');
-      final dLight = _sharedPrefs?.getString('${widget.prefix}-default-light');
-      final dDark = _sharedPrefs?.getString('${widget.prefix}-default-dark');
+      final isDark = _sharedPrefs?.getBool('${widget.id}-dark-mode');
+      final followSystem = _sharedPrefs?.getBool('${widget.id}-follow-system');
+      final dLight = _sharedPrefs?.getString('${widget.id}-default-light');
+      final dDark = _sharedPrefs?.getString('${widget.id}-default-dark');
       final dCupertino =
-          _sharedPrefs?.getString('${widget.prefix}-default-cupertino');
+          _sharedPrefs?.getString('${widget.id}-default-cupertino');
       final dCustom =
-          _sharedPrefs?.getString('${widget.prefix}-default-custom-data');
+          _sharedPrefs?.getString('${widget.id}-default-custom-data');
       //
       if (dCustom != null && _customData.containsKey(dCustom)) {
         _currentCustomDataKey = dCustom;
@@ -345,7 +344,7 @@ class ThemeManagerState extends State<ThemeManager> {
     setState(() {
       _currentCupertinoThemeKey = themeKey;
     });
-    _sharedPrefs?.setString('${widget.prefix}-default-cupertino', themeKey);
+    _sharedPrefs?.setString('${widget.id}-default-cupertino', themeKey);
   }
 
   /// set default theme for [lightTheme]
@@ -353,7 +352,7 @@ class ThemeManagerState extends State<ThemeManager> {
     setState(() {
       _currentLightThemeKey = themeKey;
     });
-    _sharedPrefs?.setString('${widget.prefix}-default-light', themeKey);
+    _sharedPrefs?.setString('${widget.id}-default-light', themeKey);
   }
 
   /// set default theme for [darkTheme]
@@ -361,7 +360,7 @@ class ThemeManagerState extends State<ThemeManager> {
     setState(() {
       _currentDarkThemeKey = themeKey;
     });
-    _sharedPrefs?.setString('${widget.prefix}-default-dark', themeKey);
+    _sharedPrefs?.setString('${widget.id}-default-dark', themeKey);
   }
 
   /// set current active [customData]
@@ -369,7 +368,7 @@ class ThemeManagerState extends State<ThemeManager> {
     setState(() {
       _currentCustomDataKey = key;
     });
-    _sharedPrefs?.setString('${widget.prefix}-default-custom-data', key);
+    _sharedPrefs?.setString('${widget.id}-default-custom-data', key);
   }
 
   /// toggle between [ThemeMode.dark] and [ThemeMode.light]
@@ -382,8 +381,8 @@ class ThemeManagerState extends State<ThemeManager> {
     setState(() {
       _mode = value ? ThemeMode.dark : ThemeMode.light;
     });
-    _sharedPrefs?.setBool('${widget.prefix}-dark-mode', value);
-    _sharedPrefs?.setBool('${widget.prefix}-follow-system', false);
+    _sharedPrefs?.setBool('${widget.id}-dark-mode', value);
+    _sharedPrefs?.setBool('${widget.id}-follow-system', false);
   }
 
   /// set [themeMode] value to [ThemeMode.system] by passing [true],
@@ -395,17 +394,16 @@ class ThemeManagerState extends State<ThemeManager> {
             ? ThemeMode.system
             : checkDark() ? ThemeMode.dark : ThemeMode.light;
       } else {
-        final isDark = _sharedPrefs?.getBool('${widget.prefix}-dark-mode');
+        final isDark = _sharedPrefs?.getBool('${widget.id}-dark-mode');
         _mode = value
             ? ThemeMode.system
             : isDark != null && isDark ? ThemeMode.dark : ThemeMode.light;
       }
     });
 
-    _sharedPrefs?.setBool('${widget.prefix}-follow-system', value);
+    _sharedPrefs?.setBool('${widget.id}-follow-system', value);
     if (widget.keepOnDisableFollow)
-      _sharedPrefs?.setBool(
-          '${widget.prefix}-dark-mode', _mode == ThemeMode.dark);
+      _sharedPrefs?.setBool('${widget.id}-dark-mode', _mode == ThemeMode.dark);
   }
 
   /// check current theme is dark or not.
@@ -497,13 +495,18 @@ class ThemeManagerState extends State<ThemeManager> {
 
   /// reset every settings, Go back to hard coded settings.
   Future<void> resetSettings() async {
-    await _sharedPrefs?.remove('${widget.prefix}-dark-mode');
-    await _sharedPrefs?.remove('${widget.prefix}-follow-system');
-    await _sharedPrefs?.remove('${widget.prefix}-default-light');
-    await _sharedPrefs?.remove('${widget.prefix}-default-dark');
-    await _sharedPrefs?.remove('${widget.prefix}-default-cupertino');
-    await _sharedPrefs?.remove('${widget.prefix}-default-custom-data');
+    await _sharedPrefs?.remove('${widget.id}-dark-mode');
+    await _sharedPrefs?.remove('${widget.id}-follow-system');
+    await _sharedPrefs?.remove('${widget.id}-default-light');
+    await _sharedPrefs?.remove('${widget.id}-default-dark');
+    await _sharedPrefs?.remove('${widget.id}-default-cupertino');
+    await _sharedPrefs?.remove('${widget.id}-default-custom-data');
     _setDefaults();
     setState(() {});
+  }
+
+  /// reset every settings throughout the whole app.
+  Future<bool> resetAll() async {
+    return _sharedPrefs.clear();
   }
 }
