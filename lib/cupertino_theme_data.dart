@@ -1,4 +1,8 @@
-import 'package:flutter/cupertino.dart' show CupertinoThemeData;
+// Copyright 2020 Sani Haq. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+import 'package:flutter/cupertino.dart' show CupertinoThemeData, required;
 
 class CupertinoThemeManagerData {
   final String key;
@@ -6,9 +10,9 @@ class CupertinoThemeManagerData {
   final String creator;
   final CupertinoThemeData themeData;
   CupertinoThemeManagerData({
-    this.key,
+    @required this.key,
     this.name,
     this.creator,
-    this.themeData,
+    @required this.themeData,
   });
 }

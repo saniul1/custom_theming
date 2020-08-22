@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:example/util.dart/restart_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:theme_manager/theme_manager.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart' hide Radio;
@@ -7,16 +8,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 
 import 'models.dart';
-import 'widgets/check_box.dart';
+import 'widgets/app_settings.dart';
 import 'widgets/cupertino_page.dart';
-import 'widgets/delete_dialogue.dart';
 import 'widgets/material_page.dart';
-import 'widgets/radio.dart';
-import 'widgets/theme_selector.dart';
 
 void main() {
   runApp(
     ReloadChildWidget(
+      // sets [ThemeManager] for the whole app
       child: ThemeManager(
         defaultLightTheme: 'default-light',
         defaultDarkTheme: 'default-dark',
@@ -24,8 +23,9 @@ void main() {
         themeMode: ThemeMode.system,
         themes: MyThemes.themes,
         cupertinoThemes: MyThemes.cupertinoThemes,
+        // yu can pass any kind of data, even your own theme data.
         customData: MyThemes.customData,
-        keepOnDisableFollow: false,
+        keepSettingOnDisableFollow: true,
         child: MyApp(),
       ),
     ),
@@ -39,14 +39,41 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   Key key = UniqueKey();
+  SharedPreferences _sharedPrefs;
 
   bool isCupertino = false;
   bool onlyWidgetApp = false;
   bool noAppWidget = false;
   bool isMultiTheme = false;
 
-  bool _showMore = false;
-  bool _warnDelete = false;
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((prefs) {
+      _sharedPrefs = prefs;
+      setState(() {
+        isCupertino = _sharedPrefs?.getBool('is-cupertino') ?? isCupertino;
+        onlyWidgetApp =
+            _sharedPrefs?.getBool('only-widget-app') ?? onlyWidgetApp;
+        noAppWidget = _sharedPrefs?.getBool('no-app-widget') ?? noAppWidget;
+        isMultiTheme = _sharedPrefs?.getBool('is-multi-theme') ?? isMultiTheme;
+      });
+    });
+  }
+
+  // only for debug example app
+  setApp({bool isMulti, bool isCuper, bool isOnly, bool noApp}) {
+    setState(() {
+      isCupertino = isCuper ?? isCupertino;
+      onlyWidgetApp = isOnly ?? onlyWidgetApp;
+      isMultiTheme = isMulti ?? isMultiTheme;
+      noAppWidget = noApp ?? noAppWidget;
+    });
+    _sharedPrefs?.setBool('is-cupertino', isCupertino);
+    _sharedPrefs?.setBool('only-widget-app', onlyWidgetApp);
+    _sharedPrefs?.setBool('is-multi-theme', isMultiTheme);
+    _sharedPrefs?.setBool('no-app-widget', noAppWidget);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,193 +85,14 @@ class _MyAppState extends State<MyApp> {
         if (isMultiTheme && isCupertino && !onlyWidgetApp) MultiCupertinoApp(),
         if (isCupertino && !isMultiTheme && !onlyWidgetApp) TestCupertinoApp(),
         if (!isCupertino && !isMultiTheme && !onlyWidgetApp) TestMaterialApp(),
-        if (_showMore)
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _showMore = false;
-              });
-            },
-            child: Container(
-              color: Colors.black12,
-            ),
-          ),
         Align(
           alignment: Alignment.bottomRight,
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _showMore = !_showMore;
-              });
-            },
-            child: ThemeManager(
-              customData: ThemeSelectorThemes.themeData,
-              child: Builder(builder: (context) {
-                return Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxHeight: 300,
-                          maxWidth: 300,
-                        ),
-                        child: AnimatedContainer(
-                          duration: Duration(milliseconds: 50),
-                          margin: const EdgeInsets.all(8.0),
-                          width: _showMore ? null : 40,
-                          height: _showMore ? null : 40,
-                          decoration: BoxDecoration(
-                            color:
-                                ThemeManager.customDataOf<ThemeSelectorThemes>(
-                                            context)
-                                        ?.color ??
-                                    Colors.amber,
-                            shape: _showMore
-                                ? BoxShape.rectangle
-                                : BoxShape.circle,
-                          ),
-                          child: _showMore
-                              ? Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          CheckBox(
-                                            active: isMultiTheme,
-                                            label: 'Multiple Apps',
-                                            onTap: () {
-                                              setState(() {
-                                                isMultiTheme = !isMultiTheme;
-                                              });
-                                            },
-                                          ),
-                                          CheckBox(
-                                            active: noAppWidget,
-                                            label: 'No Parent App',
-                                            onTap: () {
-                                              setState(() {
-                                                noAppWidget = !noAppWidget;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Radio(
-                                            active:
-                                                !isCupertino && !onlyWidgetApp,
-                                            label: 'Show Material App',
-                                            onTap: () {
-                                              setState(() {
-                                                isCupertino = false;
-                                                onlyWidgetApp = false;
-                                              });
-                                            },
-                                          ),
-                                          Radio(
-                                            active:
-                                                isCupertino && !onlyWidgetApp,
-                                            label: 'Show Cupertino App',
-                                            onTap: () {
-                                              setState(() {
-                                                isCupertino = true;
-                                                onlyWidgetApp = false;
-                                              });
-                                            },
-                                          ),
-                                          Radio(
-                                            active: onlyWidgetApp,
-                                            label: 'Show Widgets App Only',
-                                            onTap: () {
-                                              setState(() {
-                                                onlyWidgetApp = true;
-                                              });
-                                            },
-                                          ),
-                                        ],
-                                      ),
-                                      Stack(
-                                        children: [
-                                          Row(
-                                            children: ThemeManager.of(context)
-                                                .customDataMap
-                                                .entries
-                                                .map((entries) {
-                                              final data = entries.value.data
-                                                  as ThemeSelectorThemes;
-                                              return ThemeSelector(
-                                                color: data.color,
-                                                themeKey: entries.key,
-                                                active: entries.key ==
-                                                    ThemeManager.of(context)
-                                                        .currentCustomDataKey,
-                                              );
-                                            }).toList(),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.blue,
-                                              ),
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  setState(() {
-                                                    _warnDelete = true;
-                                                    _showMore = false;
-                                                  });
-                                                },
-                                                child: Icon(
-                                                  Icons.delete,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : Icon(Icons.more_horiz),
-                        ),
-                      ),
-                    ),
-                    if (_warnDelete)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _warnDelete = false;
-                          });
-                        },
-                        child: Container(
-                          color: Colors.black12,
-                        ),
-                      ),
-                    if (_warnDelete)
-                      DeleteSettingDialogue(
-                        onCancel: () {
-                          setState(() {
-                            _warnDelete = false;
-                          });
-                        },
-                      ),
-                  ],
-                );
-              }),
-            ),
+          child: AppSettings(
+            isMultiTheme: isMultiTheme,
+            noAppWidget: noAppWidget,
+            isCupertino: isCupertino,
+            onlyWidgetApp: onlyWidgetApp,
+            setApp: setApp,
           ),
         ),
       ],
@@ -260,19 +108,20 @@ class MultiMaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // pass [ThemeManger] data to effect material app across app
       theme: ThemeManager.of(context).lightTheme,
       darkTheme: ThemeManager.of(context).darkTheme,
       themeMode: ThemeManager.of(context).themeMode,
       home: Scaffold(
         appBar: AppBar(
           title: Text(
-              "${ThemeManager.of(context).currentThemeKey} / ${ThemeManager.of(context).themes.length}" ??
+              "${ThemeManager.of(context).currentThemeKey} / ${ThemeManager.of(context).themesMap.length}" ??
                   ''),
           leading: IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () => ThemeManager.of(context).setTheme(
-              ThemeManager.of(context).themes.keys.toList()[Random().nextInt(
-                ThemeManager.of(context).themes.keys.toList().length,
+              ThemeManager.of(context).themesMap.keys.toList()[Random().nextInt(
+                ThemeManager.of(context).themesMap.keys.toList().length,
               )],
               apply: true,
             ),
@@ -285,7 +134,7 @@ class MultiMaterialApp extends StatelessWidget {
           themeMode: ThemeMode.light,
           themes: MyThemes.themes,
           customData: MyThemes.customData,
-          keepOnDisableFollow: false,
+          keepSettingOnDisableFollow: false,
           child: TestMaterialApp(),
         ),
       ),
@@ -310,6 +159,7 @@ class TestMaterialApp extends StatelessWidget {
       color: Theme.of(context).primaryColor,
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
+        // Add additional theme after app initialization (even after app is build)
         ThemeManager.of(context).generateTheme(
           ThemeManagerData(
             key: 'generated-theme',
@@ -332,16 +182,18 @@ class MultiCupertinoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
+      // theme for [CupertinoApp]
       theme: ThemeManager.of(context).cupertinoTheme,
       home: CupertinoPageScaffold(
         child: Stack(
           children: [
             ThemeManager(
+              // set [id] to differentiate data in storage
               id: '2nd',
               defaultCupertinoTheme: 'default',
               cupertinoThemes: MyThemes.cupertinoThemes,
               customData: MyThemes.customData,
-              keepOnDisableFollow: false,
+              keepSettingOnDisableFollow: false,
               child: TestCupertinoApp(),
             ),
             Padding(
@@ -350,9 +202,7 @@ class MultiCupertinoApp extends StatelessWidget {
                 height: 130,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
-                  color: ThemeManager.cupertinoThemeOf(context)
-                      .themeData
-                      .primaryColor,
+                  color: ThemeManager.cupertinoThemeOf(context).primaryColor,
                 ),
                 child: Column(
                   children: [
@@ -366,17 +216,16 @@ class MultiCupertinoApp extends StatelessWidget {
                       child: Icon(
                         Icons.refresh,
                         color: ThemeManager.cupertinoThemeOf(context)
-                            .themeData
                             .primaryContrastingColor,
                       ),
                       onPressed: () =>
                           ThemeManager.of(context).setCupertinoTheme(
                         ThemeManager.of(context)
-                            .cupertinoThemes
+                            .cupertinoThemesMap
                             .keys
                             .toList()[Random().nextInt(
                           ThemeManager.of(context)
-                              .cupertinoThemes
+                              .cupertinoThemesMap
                               .keys
                               .toList()
                               .length,
@@ -389,7 +238,6 @@ class MultiCupertinoApp extends StatelessWidget {
                         ThemeManager.of(context).currentCupertinoThemeKey,
                         style: TextStyle(
                           color: ThemeManager.cupertinoThemeOf(context)
-                              .themeData
                               .primaryContrastingColor,
                         ),
                       ),
@@ -458,11 +306,12 @@ class WidgetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Tou can use only [WidgetsApp] to build your app and [ThemeManager] to access [themeData]
     return WidgetsApp(
       title: 'Theming',
       builder: (context, int) {
         return Container(
-          color: ThemeManager.themeOf(context).themeData.canvasColor,
+          color: ThemeManager.themeOf(context).canvasColor,
           child: Center(
             child: RaisedButton(
               onPressed: ThemeManager.of(context).toggleDarkMode,
@@ -486,12 +335,13 @@ class NoAppWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // You don't even need any app widget, because [ThemeManger] itself is one.
     return Container(
-      color: ThemeManager.themeOf(context).themeData.canvasColor,
+      color: ThemeManager.themeOf(context).canvasColor,
       child: Center(
         child: Column(children: [
           Container(
-            color: ThemeManager.themeOf(context).themeData.primaryColor,
+            color: ThemeManager.themeOf(context).primaryColor,
             height: 100,
             child: Center(
               child: RaisedButton(
@@ -503,10 +353,10 @@ class NoAppWidget extends StatelessWidget {
               ),
             ),
           ),
-          ...ThemeManager.of(context).themes.keys.map((themeKey) {
+          ...ThemeManager.of(context).themesMap.keys.map((themeKey) {
             return RaisedButton(
               color: ThemeManager.of(context)
-                  .themes[themeKey]
+                  .themesMap[themeKey]
                   .themeData
                   .primaryColor,
               onPressed: () => ThemeManager.of(context)
@@ -523,7 +373,7 @@ class NoAppWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      ThemeManager.of(context).themes[themeKey].name,
+                      ThemeManager.of(context).themesMap[themeKey].name,
                       style: TextStyle(color: Colors.white),
                     ),
                   ),

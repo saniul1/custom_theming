@@ -1,4 +1,3 @@
-import 'package:example/main.dart';
 import 'package:example/util.dart/restart_app.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';

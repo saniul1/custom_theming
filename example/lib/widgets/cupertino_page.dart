@@ -37,7 +37,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: ThemeManager.of(context)
-                      .cupertinoThemes
+                      .cupertinoThemesMap
                       .keys
                       .map((themeKey) {
                     return Padding(
@@ -55,7 +55,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ThemeManager.of(context)
-                                    .cupertinoThemes[themeKey]
+                                    .cupertinoThemesMap[themeKey]
                                     .name,
                               ),
                             ),

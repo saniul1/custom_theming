@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Column(
               children: [
-                ...ThemeManager.of(context).themes.keys.map((themeKey) {
+                ...ThemeManager.of(context).themesMap.keys.map((themeKey) {
                   return RaisedButton(
                     onPressed: () {
                       ThemeManager.of(context)
@@ -74,13 +74,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            ThemeManager.of(context).themes[themeKey].name,
+                            ThemeManager.of(context).themesMap[themeKey].name,
                           ),
                         ),
                       ],
                     ),
                     color: ThemeManager.of(context).checkIfCurrent(themeKey)
-                        ? ThemeManager.themeOf(context).themeData.primaryColor
+                        ? ThemeManager.themeOf(context).primaryColor
                         : Colors.blue,
                   );
                 }).toList(),

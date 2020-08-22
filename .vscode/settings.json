@@ -1,7 +1,11 @@
 {
   "cSpell.words": [
+    "Cuper",
     "Prefs",
     "horiz"
   ],
+  "licenser.author": "Sani Haq",
+  "licenser.license": "BSD3",
+  "licenser.projectName": "Theme Manager",
   "dart.flutterSdkPath": "C:\\src\\flutter"
 }
