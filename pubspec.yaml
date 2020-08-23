@@ -1,8 +1,8 @@
-name: theme_manager
-description: Flutter theme manager.
+name: themes_manager
+description: Flutter themes manager.
 version: 1.0.0
 author: Sani Haq
-homepage:
+homepage: https://github.com/sanihaq/themes_manager
 
 # publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 

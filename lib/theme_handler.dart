@@ -14,7 +14,7 @@ import 'theme_data.dart';
 enum ThemeType { material, cupertino, custom }
 
 class _ThemeManager extends InheritedWidget {
-  final ThemeManagerState data;
+  final ThemesManagerState data;
 
   _ThemeManager({
     this.data,
@@ -28,7 +28,7 @@ class _ThemeManager extends InheritedWidget {
   }
 }
 
-class ThemeManager extends StatefulWidget {
+class ThemesManager extends StatefulWidget {
   /// child widget (wrap it with a build function to correctly get the context)
   final Widget child;
 
@@ -66,7 +66,7 @@ class ThemeManager extends StatefulWidget {
   /// All your [CustomThemeManagerData] in a list
   final List<CustomThemeManagerData> customData;
 
-  /// [ThemeManager] is best used as parent of [MaterialApp] or [CupertinoApp] or [WidgetsApp],
+  /// [ThemesManager] is best used as parent of [MaterialApp] or [CupertinoApp] or [WidgetsApp],
   ///
   /// ** But you can also use it without any of these widgets. **
   ///
@@ -78,7 +78,7 @@ class ThemeManager extends StatefulWidget {
   /// set [keepSettingOnDisableFollow] to [true] to keep current applied theme even if [themeMode] changes from [ThemeMode.system]
   ///
   /// [cupertinoThemes] does not support [themeMode]. it always follow system setting.
-  ThemeManager({
+  ThemesManager({
     Key key,
     this.id = 'app',
     this.keepSettingOnDisableFollow = false,
@@ -108,12 +108,12 @@ class ThemeManager extends StatefulWidget {
   }
 
   @override
-  ThemeManagerState createState() => ThemeManagerState();
+  ThemesManagerState createState() => ThemesManagerState();
 
   /// get state of [ThemeManger] of current context.
   ///
   /// Access full theme list via designated getters (as { key: value } pair).
-  static ThemeManagerState of(BuildContext context) {
+  static ThemesManagerState of(BuildContext context) {
     _ThemeManager inherited =
         (context.dependOnInheritedWidgetOfExactType<_ThemeManager>());
     return inherited.data;
@@ -164,7 +164,7 @@ class ThemeManager extends StatefulWidget {
   }
 }
 
-class ThemeManagerState extends State<ThemeManager> {
+class ThemesManagerState extends State<ThemesManager> {
   SharedPreferences _sharedPrefs;
 
   BuildContext _mediaContext;
@@ -441,7 +441,7 @@ class ThemeManagerState extends State<ThemeManager> {
         : key == _currentLightThemeKey;
   }
 
-  /// Make sure [ThemeManager] exist in the widget tree and your are in the correct [BuildContext].
+  /// Make sure [ThemesManager] exist in the widget tree and your are in the correct [BuildContext].
   /// ```
   /// builder: (context, child) {
   ///   ...
@@ -461,7 +461,7 @@ class ThemeManagerState extends State<ThemeManager> {
     _themes[themeData.key] = themeData;
   }
 
-  /// Make sure [ThemeManager] exist in the widget tree, above of the widget where you are trying to add new themes.
+  /// Make sure [ThemesManager] exist in the widget tree, above of the widget where you are trying to add new themes.
   /// ```
   /// builder: (context, child) {
   ///   ...
@@ -482,7 +482,7 @@ class ThemeManagerState extends State<ThemeManager> {
   }
 
   /// Add additional [customData] later in the app
-  /// always make sure [ThemeManager] exist above your builder function
+  /// always make sure [ThemesManager] exist above your builder function
   void addToCustomData(
     CustomThemeManagerData data,
   ) {

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:theme_manager/theme_manager.dart';
+import 'package:themes_manager/theme_manager.dart';
 
 import '../models.dart';
 
@@ -36,7 +36,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: ThemeManager.of(context)
+                  children: ThemesManager.of(context)
                       .cupertinoThemesMap
                       .keys
                       .map((themeKey) {
@@ -46,7 +46,7 @@ class CupertinoStoreHomePage extends StatelessWidget {
                         vertical: 5,
                       ),
                       child: CupertinoButton(
-                        onPressed: () => ThemeManager.of(context)
+                        onPressed: () => ThemesManager.of(context)
                             .setCupertinoTheme(themeKey),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -54,18 +54,18 @@ class CupertinoStoreHomePage extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                ThemeManager.of(context)
+                                ThemesManager.of(context)
                                     .cupertinoThemesMap[themeKey]
                                     .name,
                               ),
                             ),
                           ],
                         ),
-                        color:
-                            ThemeManager.of(context).currentCupertinoThemeKey ==
-                                    themeKey
-                                ? CupertinoTheme.of(context).primaryColor
-                                : Color(0xFF2196F3),
+                        color: ThemesManager.of(context)
+                                    .currentCupertinoThemeKey ==
+                                themeKey
+                            ? CupertinoTheme.of(context).primaryColor
+                            : Color(0xFF2196F3),
                       ),
                     );
                   }).toList(),
@@ -82,13 +82,13 @@ class CupertinoStoreHomePage extends StatelessWidget {
                     child: Column(
                       children: [
                         Text(
-                          ThemeManager.customDataOf<Name>(
+                          ThemesManager.customDataOf<Name>(
                                       context, ThemeType.cupertino)
                                   ?.name ??
                               '',
                         ),
                         Text(
-                          ThemeManager.customDataOf<Name>(
+                          ThemesManager.customDataOf<Name>(
                                       context, ThemeType.cupertino)
                                   ?.description ??
                               '...',

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart' hide Radio;
-import 'package:theme_manager/theme_manager.dart';
+import 'package:themes_manager/theme_manager.dart';
 
 import '../models.dart';
 import 'check_box.dart';
@@ -37,7 +37,7 @@ class _AppSettingsState extends State<AppSettings> {
 
   @override
   Widget build(BuildContext context) {
-    return ThemeManager(
+    return ThemesManager(
       customData: ThemeSelectorThemes.themeData,
       child: Builder(builder: (context) {
         return GestureDetector(
@@ -72,7 +72,7 @@ class _AppSettingsState extends State<AppSettings> {
                     width: _showMore ? null : 40,
                     height: _showMore ? null : 40,
                     decoration: BoxDecoration(
-                      color: ThemeManager.customDataOf<ThemeSelectorThemes>(
+                      color: ThemesManager.customDataOf<ThemeSelectorThemes>(
                                   context)
                               ?.color ??
                           Colors.amber,
@@ -129,7 +129,7 @@ class _AppSettingsState extends State<AppSettings> {
                                 Stack(
                                   children: [
                                     Row(
-                                      children: ThemeManager.of(context)
+                                      children: ThemesManager.of(context)
                                           .customDataMap
                                           .entries
                                           .map((entries) {
@@ -139,7 +139,7 @@ class _AppSettingsState extends State<AppSettings> {
                                           color: data.color,
                                           themeKey: entries.key,
                                           active: entries.key ==
-                                              ThemeManager.of(context)
+                                              ThemesManager.of(context)
                                                   .currentCustomDataKey,
                                         );
                                       }).toList(),

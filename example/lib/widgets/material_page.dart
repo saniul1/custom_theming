@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:theme_manager/theme_manager.dart';
+import 'package:themes_manager/theme_manager.dart';
 
 import '../models.dart';
 
@@ -20,7 +20,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
         actions: [
           RaisedButton(
-            onPressed: ThemeManager.of(context).resetSettings,
+            onPressed: ThemesManager.of(context).resetSettings,
             child: Text('Delete'),
           ),
         ],
@@ -31,8 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Center(
               child: Switch(
-                value: ThemeManager.of(context).checkDark(),
-                onChanged: (_) => ThemeManager.of(context).toggleDarkMode(),
+                value: ThemesManager.of(context).checkDark(),
+                onChanged: (_) => ThemesManager.of(context).toggleDarkMode(),
                 activeTrackColor: Colors.lightGreenAccent,
                 activeColor: Colors.green,
               ),
@@ -41,8 +41,9 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Checkbox(
-                  value: ThemeManager.of(context).themeMode == ThemeMode.system,
-                  onChanged: ThemeManager.of(context).setThemeModeToSystem,
+                  value:
+                      ThemesManager.of(context).themeMode == ThemeMode.system,
+                  onChanged: ThemesManager.of(context).setThemeModeToSystem,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,
                 ),
@@ -54,19 +55,19 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Column(
               children: [
-                ...ThemeManager.of(context).themesMap.keys.map((themeKey) {
+                ...ThemesManager.of(context).themesMap.keys.map((themeKey) {
                   return RaisedButton(
                     onPressed: () {
-                      ThemeManager.of(context)
+                      ThemesManager.of(context)
                           .setTheme(themeKey, both: true, apply: true);
-                      print(ThemeManager.customDataOf<Name>(
+                      print(ThemesManager.customDataOf<Name>(
                               context, ThemeType.material)
                           ?.description);
                     },
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (ThemeManager.of(context).checkIfDefault(themeKey))
+                        if (ThemesManager.of(context).checkIfDefault(themeKey))
                           Icon(
                             Icons.star,
                             size: 14,
@@ -74,13 +75,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            ThemeManager.of(context).themesMap[themeKey].name,
+                            ThemesManager.of(context).themesMap[themeKey].name,
                           ),
                         ),
                       ],
                     ),
-                    color: ThemeManager.of(context).checkIfCurrent(themeKey)
-                        ? ThemeManager.themeOf(context).primaryColor
+                    color: ThemesManager.of(context).checkIfCurrent(themeKey)
+                        ? ThemesManager.themeOf(context).primaryColor
                         : Colors.blue,
                   );
                 }).toList(),

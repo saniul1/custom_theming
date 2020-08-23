@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:example/util.dart/restart_app.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:theme_manager/theme_manager.dart';
+import 'package:themes_manager/theme_manager.dart';
 import 'package:example/themes.dart';
 import 'package:flutter/material.dart' hide Radio;
 import 'package:flutter/cupertino.dart';
@@ -16,14 +16,14 @@ void main() {
   runApp(
     ReloadChildWidget(
       // sets [ThemeManager] for the whole app
-      child: ThemeManager(
+      child: ThemesManager(
         defaultLightTheme: 'default-light',
         defaultDarkTheme: 'default-dark',
         defaultCupertinoTheme: 'default',
         themeMode: ThemeMode.system,
         themes: MyThemes.themes,
         cupertinoThemes: MyThemes.cupertinoThemes,
-        // yu can pass any kind of data, even your own theme data.
+        // you can pass any kind of data, even your own theme data.
         customData: MyThemes.customData,
         keepSettingOnDisableFollow: true,
         child: MyApp(),
@@ -109,25 +109,28 @@ class MultiMaterialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // pass [ThemeManger] data to effect material app across app
-      theme: ThemeManager.of(context).lightTheme,
-      darkTheme: ThemeManager.of(context).darkTheme,
-      themeMode: ThemeManager.of(context).themeMode,
+      theme: ThemesManager.of(context).lightTheme,
+      darkTheme: ThemesManager.of(context).darkTheme,
+      themeMode: ThemesManager.of(context).themeMode,
       home: Scaffold(
         appBar: AppBar(
           title: Text(
-              "${ThemeManager.of(context).currentThemeKey} / ${ThemeManager.of(context).themesMap.length}" ??
+              "${ThemesManager.of(context).currentThemeKey} / ${ThemesManager.of(context).themesMap.length}" ??
                   ''),
           leading: IconButton(
             icon: Icon(Icons.refresh),
-            onPressed: () => ThemeManager.of(context).setTheme(
-              ThemeManager.of(context).themesMap.keys.toList()[Random().nextInt(
-                ThemeManager.of(context).themesMap.keys.toList().length,
+            onPressed: () => ThemesManager.of(context).setTheme(
+              ThemesManager.of(context)
+                  .themesMap
+                  .keys
+                  .toList()[Random().nextInt(
+                ThemesManager.of(context).themesMap.keys.toList().length,
               )],
               apply: true,
             ),
           ),
         ),
-        body: ThemeManager(
+        body: ThemesManager(
           id: '2nd',
           defaultLightTheme: 'default-light',
           defaultDarkTheme: 'default-dark',
@@ -151,16 +154,16 @@ class TestMaterialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeManager.of(context).lightTheme,
-      darkTheme: ThemeManager.of(context).darkTheme,
-      themeMode: ThemeManager.of(context).themeMode,
+      theme: ThemesManager.of(context).lightTheme,
+      darkTheme: ThemesManager.of(context).darkTheme,
+      themeMode: ThemesManager.of(context).themeMode,
       initialRoute: "/",
       title: 'Theming',
       color: Theme.of(context).primaryColor,
       home: MyHomePage(title: 'Flutter Demo Home Page'),
       builder: (context, child) {
         // Add additional theme after app initialization (even after app is build)
-        ThemeManager.of(context).generateTheme(
+        ThemesManager.of(context).generateTheme(
           ThemeManagerData(
             key: 'generated-theme',
             name: 'Generated Theme',
@@ -183,11 +186,11 @@ class MultiCupertinoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoApp(
       // theme for [CupertinoApp]
-      theme: ThemeManager.of(context).cupertinoTheme,
+      theme: ThemesManager.of(context).cupertinoTheme,
       home: CupertinoPageScaffold(
         child: Stack(
           children: [
-            ThemeManager(
+            ThemesManager(
               // set [id] to differentiate data in storage
               id: '2nd',
               defaultCupertinoTheme: 'default',
@@ -202,29 +205,29 @@ class MultiCupertinoApp extends StatelessWidget {
                 height: 130,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
-                  color: ThemeManager.cupertinoThemeOf(context).primaryColor,
+                  color: ThemesManager.cupertinoThemeOf(context).primaryColor,
                 ),
                 child: Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "${ThemeManager.customDataOf<Name>(context, ThemeType.cupertino)?.no ?? -1}",
+                        "${ThemesManager.customDataOf<Name>(context, ThemeType.cupertino)?.no ?? -1}",
                       ),
                     ),
                     CupertinoButton(
                       child: Icon(
                         Icons.refresh,
-                        color: ThemeManager.cupertinoThemeOf(context)
+                        color: ThemesManager.cupertinoThemeOf(context)
                             .primaryContrastingColor,
                       ),
                       onPressed: () =>
-                          ThemeManager.of(context).setCupertinoTheme(
-                        ThemeManager.of(context)
+                          ThemesManager.of(context).setCupertinoTheme(
+                        ThemesManager.of(context)
                             .cupertinoThemesMap
                             .keys
                             .toList()[Random().nextInt(
-                          ThemeManager.of(context)
+                          ThemesManager.of(context)
                               .cupertinoThemesMap
                               .keys
                               .toList()
@@ -235,9 +238,9 @@ class MultiCupertinoApp extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        ThemeManager.of(context).currentCupertinoThemeKey,
+                        ThemesManager.of(context).currentCupertinoThemeKey,
                         style: TextStyle(
-                          color: ThemeManager.cupertinoThemeOf(context)
+                          color: ThemesManager.cupertinoThemeOf(context)
                               .primaryContrastingColor,
                         ),
                       ),
@@ -262,13 +265,13 @@ class TestCupertinoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeManager.of(context).cupertinoTheme,
+      theme: ThemesManager.of(context).cupertinoTheme,
       initialRoute: "/",
       title: 'Theming',
       color: Theme.of(context).primaryColor,
       home: CupertinoStoreHomePage(),
       builder: (context, child) {
-        ThemeManager.of(context).generateCupertinoTheme(
+        ThemesManager.of(context).generateCupertinoTheme(
           CupertinoThemeManagerData(
             key: 'generated',
             name: 'Generated on Build',
@@ -278,7 +281,7 @@ class TestCupertinoApp extends StatelessWidget {
             ),
           ),
         );
-        ThemeManager.of(context).addToCustomData(
+        ThemesManager.of(context).addToCustomData(
           CustomThemeManagerData(
             key: 'generated',
             data: Name(
@@ -289,8 +292,8 @@ class TestCupertinoApp extends StatelessWidget {
           ),
         );
         //! getting data this way is possible too
-        final Name name = ThemeManager.of(context)
-            .customDataMap[ThemeManager.of(context).currentCupertinoThemeKey]
+        final Name name = ThemesManager.of(context)
+            .customDataMap[ThemesManager.of(context).currentCupertinoThemeKey]
             ?.data;
         print(name?.description);
         return child;
@@ -311,10 +314,10 @@ class WidgetApp extends StatelessWidget {
       title: 'Theming',
       builder: (context, int) {
         return Container(
-          color: ThemeManager.themeOf(context).canvasColor,
+          color: ThemesManager.themeOf(context).canvasColor,
           child: Center(
             child: RaisedButton(
-              onPressed: ThemeManager.of(context).toggleDarkMode,
+              onPressed: ThemesManager.of(context).toggleDarkMode,
               child: Text(
                 'Hello, world!',
                 textDirection: TextDirection.ltr,
@@ -337,15 +340,15 @@ class NoAppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // You don't even need any app widget, because [ThemeManger] itself is one.
     return Container(
-      color: ThemeManager.themeOf(context).canvasColor,
+      color: ThemesManager.themeOf(context).canvasColor,
       child: Center(
         child: Column(children: [
           Container(
-            color: ThemeManager.themeOf(context).primaryColor,
+            color: ThemesManager.themeOf(context).primaryColor,
             height: 100,
             child: Center(
               child: RaisedButton(
-                onPressed: ThemeManager.of(context).toggleDarkMode,
+                onPressed: ThemesManager.of(context).toggleDarkMode,
                 child: Text(
                   'Toggle',
                   textDirection: TextDirection.ltr,
@@ -353,18 +356,18 @@ class NoAppWidget extends StatelessWidget {
               ),
             ),
           ),
-          ...ThemeManager.of(context).themesMap.keys.map((themeKey) {
+          ...ThemesManager.of(context).themesMap.keys.map((themeKey) {
             return RaisedButton(
-              color: ThemeManager.of(context)
+              color: ThemesManager.of(context)
                   .themesMap[themeKey]
                   .themeData
                   .primaryColor,
-              onPressed: () => ThemeManager.of(context)
+              onPressed: () => ThemesManager.of(context)
                   .setTheme(themeKey, apply: true, both: false),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (ThemeManager.of(context).checkIfDefault(themeKey))
+                  if (ThemesManager.of(context).checkIfDefault(themeKey))
                     Icon(
                       Icons.star,
                       size: 14,
@@ -373,11 +376,11 @@ class NoAppWidget extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      ThemeManager.of(context).themesMap[themeKey].name,
+                      ThemesManager.of(context).themesMap[themeKey].name,
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  if (ThemeManager.of(context).checkIfCurrent(themeKey))
+                  if (ThemesManager.of(context).checkIfCurrent(themeKey))
                     Icon(
                       Icons.done_outline,
                       size: 14,
@@ -390,7 +393,7 @@ class NoAppWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              ThemeManager.customDataOf<Name>(context, ThemeType.material)
+              ThemesManager.customDataOf<Name>(context, ThemeType.material)
                       ?.name ??
                   'Nothing!',
             ),
@@ -398,7 +401,7 @@ class NoAppWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              ThemeManager.customDataOf<Name>(context, ThemeType.material)
+              ThemesManager.customDataOf<Name>(context, ThemeType.material)
                       ?.no
                       ?.toString() ??
                   'Nothing!!',

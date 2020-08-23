@@ -158,13 +158,13 @@
       "languageVersion": "2.10"
     },
     {
-      "name": "theme_manager",
+      "name": "themes_manager",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "2.7"
     }
   ],
-  "generated": "2020-08-22T11:22:19.415651Z",
+  "generated": "2020-08-23T06:10:09.697156Z",
   "generator": "pub",
   "generatorVersion": "2.10.0-4.0.dev.flutter-0341576448"
 }

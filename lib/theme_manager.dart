@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-library theme_manager;
+library themes_manager;
 
 export 'theme_handler.dart';
 export 'theme_data.dart';

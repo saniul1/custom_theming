@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:theme_manager/theme_handler.dart';
+import 'package:themes_manager/theme_handler.dart';
 
 class ThemeSelector extends StatefulWidget {
   const ThemeSelector({
@@ -33,7 +33,7 @@ class _ThemeSelectorState extends State<ThemeSelector> {
         setState(() {
           size = 30;
         });
-        ThemeManager.of(context).setCurrentCustomData(widget.themeKey);
+        ThemesManager.of(context).setCurrentCustomData(widget.themeKey);
       },
       child: Padding(
         padding: const EdgeInsets.all(8.0),

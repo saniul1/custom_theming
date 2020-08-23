@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' show Color, Colors;
-import 'package:theme_manager/custom_data.dart';
+import 'package:themes_manager/custom_data.dart';
 
 class Name {
   final String name;

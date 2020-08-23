@@ -1,7 +1,7 @@
 import 'package:example/util.dart/restart_app.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/widgets.dart';
-import 'package:theme_manager/theme_manager.dart';
+import 'package:themes_manager/theme_manager.dart';
 
 class DeleteSettingDialogue extends StatelessWidget {
   const DeleteSettingDialogue({
@@ -20,7 +20,7 @@ class DeleteSettingDialogue extends StatelessWidget {
         child: Container(
           height: 150,
           width: double.infinity,
-          color: ThemeManager.customDataOf(context).color,
+          color: ThemesManager.customDataOf(context).color,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -38,7 +38,7 @@ class DeleteSettingDialogue extends StatelessWidget {
                     Button(
                       label: 'Yes',
                       onTap: () {
-                        ThemeManager.of(context).resetAll().then((_) {
+                        ThemesManager.of(context).resetAll().then((_) {
                           ReloadChildWidget.of(context).restartApp();
                           onCancel();
                         });
