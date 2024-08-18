@@ -1,4 +1,4 @@
-# Flutter Themes Manger
+# Flutter Themes Manger (Deprecated)
 
 A Themes Manger for your flutter app. Handles multiple themes in your app and easily switch between them. Generate new themes on the fly. Create your own Themes with custom data.
 
